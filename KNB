@@ -1,0 +1,4174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KNB - Социальная сеть</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .color-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.color-option:hover {
+    border-color: white;
+}
+
+.color-option.selected {
+    border-color: white;
+    transform: scale(1.1);
+}
+        .profile-edit-modal .modal-content {
+    max-width: 600px;
+}
+
+.avatar-edit {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 20px;
+    cursor: pointer;
+}
+
+.avatar-edit img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.avatar-edit-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.avatar-edit:hover .avatar-edit-overlay {
+    opacity: 1;
+}
+
+.banner-edit {
+    position: relative;
+    height: 200px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    background: linear-gradient(45deg, var(--primary-color), #9b59b6);
+}
+
+.banner-edit img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.banner-edit-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.banner-edit:hover .banner-edit-overlay {
+    opacity: 1;
+}
+
+.messages-container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+    height: calc(100vh - 200px);
+}
+
+.conversations-list {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    overflow-y: auto;
+}
+
+.conversation-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.conversation-item:hover,
+.conversation-item.active {
+    background-color: var(--darker-bg);
+}
+
+.conversation-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 20px;
+    color: white;
+    user-select: none;
+}
+
+.conversation-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.conversation-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.conversation-last-message {
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conversation-time {
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.messages-area {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.messages-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.messages-list {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.message {
+    max-width: 70%;
+    display: flex;
+    flex-direction: column;
+}
+
+.message.sent {
+    align-self: flex-end;
+}
+
+.message.received {
+    align-self: flex-start;
+}
+
+.message-content {
+    padding: 12px 15px;
+    border-radius: 15px;
+    position: relative;
+    word-wrap: break-word;
+}
+
+.message.sent .message-content {
+    background-color: var(--primary-color);
+    border-bottom-right-radius: 5px;
+}
+
+.message.received .message-content {
+    background-color: var(--darker-bg);
+    border-bottom-left-radius: 5px;
+}
+
+.message-time {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 5px;
+    text-align: right;
+}
+
+.message-input-container {
+    padding: 20px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: 10px;
+}
+
+.message-input {
+    flex: 1;
+    padding: 12px 15px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    background-color: var(--darker-bg);
+    color: var(--text-color);
+}
+
+.no-conversation-selected {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.verification-types {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.verification-type {
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.verification-type:hover {
+    border-color: var(--primary-color);
+}
+
+.verification-type.selected {
+    border-color: var(--verified-color);
+    background-color: rgba(29, 161, 242, 0.1);
+}
+
+.verification-type.gold {
+    border-color: gold;
+}
+
+.verification-type.gold.selected {
+    background-color: rgba(255, 215, 0, 0.1);
+}
+
+.verification-type.silver {
+    border-color: silver;
+}
+
+.verification-type.silver.selected {
+    background-color: rgba(192, 192, 192, 0.1);
+}
+
+.verification-type i {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.verification-type.gold i {
+    color: gold;
+}
+
+.verification-type.silver i {
+    color: silver;
+}
+
+.verification-type.blue i {
+    color: var(--verified-color);
+}
+
+.verification-document-upload {
+    border: 2px dashed var(--border-color);
+    border-radius: 10px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.verification-document-upload:hover {
+    border-color: var(--primary-color);
+}
+
+.verification-preview {
+    margin-top: 15px;
+    max-height: 200px;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.verification-preview img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+}
+
+.verification-status-details {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: var(--darker-bg);
+    border-radius: 10px;
+}
+
+.admin-verification-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+        :root {
+            --primary-color: #7289da;
+            --dark-bg: #1a1a1a;
+            --darker-bg: #121212;
+            --card-bg: #242424;
+            --text-color: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: #333;
+            --success: #43b581;
+            --danger: #f04747;
+            --warning: #faa61a;
+            --verified-color: #1DA1F2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr 300px;
+            gap: 20px;
+            padding: 20px;
+            min-height: calc(100vh - 70px);
+        }
+
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 200px 1fr 250px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .main-layout {
+                grid-template-columns: 70px 1fr;
+            }
+            .right-sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+            .left-sidebar {
+                display: none;
+            }
+        }
+
+        .header {
+            background-color: var(--darker-bg);
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 20px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar-letter {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .sidebar {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            height: fit-content;
+            position: sticky;
+            top: 90px;
+        }
+
+        .nav-links {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .nav-links li {
+            margin-bottom: 10px;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background-color: var(--primary-color);
+        }
+
+        .create-post {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .post-input {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .post-input textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 16px;
+            resize: none;
+            height: 60px;
+            padding: 10px;
+            font-family: inherit;
+        }
+
+        .post-input textarea:focus {
+            outline: none;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .media-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .media-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .media-btn:hover {
+            background-color: var(--darker-bg);
+        }
+
+        .post-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .post-btn:hover {
+            opacity: 0.9;
+        }
+
+        .post {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .post-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            margin-right: 15px;
+            color: white;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .post-user-info {
+            flex: 1;
+        }
+
+        .post-username {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: bold;
+        }
+
+        .verified-badge {
+            color: var(--verified-color);
+        }
+
+        .verification-badge {
+            background-color: var(--verified-color);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .admin-badge {
+            background-color: var(--danger);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .post-time {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .post-content {
+            margin-bottom: 15px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .post-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .post-video {
+            width: 100%;
+            max-height: 500px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .post-audio {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .post-actions-bar {
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 0;
+            margin-bottom: 15px;
+        }
+
+        .post-action {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .post-action:hover {
+            background-color: var(--darker-bg);
+        }
+
+        .post-action.liked {
+            color: var(--danger);
+        }
+
+        .post-delete-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .post-delete-btn:hover {
+            background-color: var(--darker-bg);
+            color: var(--danger);
+        }
+
+        .comments-section {
+            margin-top: 15px;
+        }
+
+        .comment-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .comment-input input {
+            flex: 1;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background-color: var(--darker-bg);
+            color: var(--text-color);
+        }
+
+        .comment {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comment-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            color: white;
+            flex-shrink: 0;
+            user-select: none;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-author {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .right-sidebar-section {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .right-sidebar-title {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .trending-item, .friend-request {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: background 0.3s;
+        }
+
+        .trending-item:hover, .friend-request:hover {
+            background-color: var(--darker-bg);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 24px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--darker-bg);
+            color: var(--text-color);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .file-label:hover {
+            opacity: 0.9;
+        }
+
+        .file-preview {
+            margin-top: 10px;
+            max-height: 200px;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .file-preview img, .file-preview video {
+            width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .profile-header {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .profile-banner {
+            height: 200px;
+            background: linear-gradient(45deg, var(--primary-color), #9b59b6);
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid var(--card-bg);
+            position: absolute;
+            bottom: -75px;
+            left: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 60px;
+            color: white;
+            user-select: none;
+        }
+
+        .profile-info {
+            padding: 100px 40px 30px;
+        }
+
+        .profile-name {
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .profile-username {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        .profile-bio {
+            margin-bottom: 20px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .notification {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: var(--darker-bg);
+            margin-bottom: 10px;
+        }
+
+        .notification.unread {
+            background-color: rgba(114, 137, 218, 0.1);
+        }
+
+        .verification-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .verification-status.verified {
+            background-color: rgba(29, 161, 242, 0.2);
+            color: var(--verified-color);
+        }
+
+        .verification-status.pending {
+            background-color: rgba(250, 166, 26, 0.2);
+            color: var(--warning);
+        }
+
+        .verification-status.rejected {
+            background-color: rgba(240, 71, 71, 0.2);
+            color: var(--danger);
+        }
+
+        @media (min-width: 1600px) {
+            .container {
+                max-width: 1800px;
+            }
+            
+            .main-layout {
+                grid-template-columns: 300px 1fr 350px;
+            }
+            
+            .post-image, .post-video {
+                max-height: 700px;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .post, .notification, .user-item {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .upload-progress {
+            margin-top: 10px;
+            background-color: var(--darker-bg);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 5px;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .media-fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .media-fullscreen-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .media-fullscreen-content img,
+        .media-fullscreen-content video {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+
+        .close-fullscreen {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            z-index: 2001;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: background 0.3s;
+        }
+
+        .user-item:hover {
+            background-color: var(--darker-bg);
+        }
+
+        .online-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--success);
+        }
+
+        .admin-panel {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .admin-section {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Модальное окно редактирования профиля -->
+<div id="editProfileModal" class="modal profile-edit-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Редактирование профиля</h2>
+            <button class="close-modal" onclick="closeEditProfileModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Баннер профиля</label>
+                <div class="banner-edit" onclick="document.getElementById('bannerFile').click()">
+                    <div id="bannerPreview" class="banner-preview"></div>
+                    <div class="banner-edit-overlay">
+                        <i class="fas fa-camera"></i> Изменить баннер
+                    </div>
+                </div>
+                <input type="file" id="bannerFile" class="file-input" accept="image/*" onchange="previewBanner(event)">
+            </div>
+            
+            <div class="form-group">
+                <label>Аватар</label>
+                <div class="avatar-edit" onclick="document.getElementById('avatarFile').click()">
+                    <div id="avatarPreview" class="avatar-preview"></div>
+                    <div class="avatar-edit-overlay">
+                        <i class="fas fa-camera"></i> Изменить аватар
+                    </div>
+                </div>
+                <input type="file" id="avatarFile" class="file-input" accept="image/*" onchange="previewAvatar(event)">
+            </div>
+            
+            <div class="form-group">
+                <label>Имя</label>
+                <input type="text" id="editProfileName" class="form-control" placeholder="Ваше имя">
+            </div>
+            
+            <div class="form-group">
+                <label>Юзернейм (через @)</label>
+                <input type="text" id="editProfileUsername" class="form-control" placeholder="@username">
+            </div>
+            
+            <div class="form-group">
+                <label>О себе</label>
+                <textarea id="editProfileBio" class="form-control" rows="4" placeholder="Расскажите о себе"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Цвет баннера</label>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <div class="color-option" style="background: #7289da;" onclick="selectBannerColor('#7289da')"></div>
+                    <div class="color-option" style="background: #9b59b6;" onclick="selectBannerColor('#9b59b6')"></div>
+                    <div class="color-option" style="background: #2ecc71;" onclick="selectBannerColor('#2ecc71')"></div>
+                    <div class="color-option" style="background: #3498db;" onclick="selectBannerColor('#3498db')"></div>
+                    <div class="color-option" style="background: #e74c3c;" onclick="selectBannerColor('#e74c3c')"></div>
+                    <div class="color-option" style="background: #f1c40f;" onclick="selectBannerColor('#f1c40f')"></div>
+                </div>
+                <input type="color" id="customBannerColor" class="form-control" style="margin-top: 10px; height: 40px;" onchange="selectCustomBannerColor(this.value)">
+            </div>
+            
+            <button class="btn btn-primary btn-block" onclick="saveProfileChanges()">Сохранить изменения</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно выбора типа верификации -->
+<div id="verificationTypeModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Выберите тип верификации</h2>
+            <button class="close-modal" onclick="closeVerificationTypeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="verification-types">
+                <div class="verification-type blue" onclick="selectVerificationType('blue')">
+                    <i class="fas fa-check-circle"></i>
+                    <h4>Синяя верификация</h4>
+                    <p>Базовая проверка личности</p>
+                    <div style="font-size: 12px; color: var(--text-secondary);">Бесплатно</div>
+                </div>
+                
+                <div class="verification-type silver" onclick="selectVerificationType('silver')">
+                    <i class="fas fa-star"></i>
+                    <h4>Серебряная верификация</h4>
+                    <p>Для активных пользователей</p>
+                    <div style="font-size: 12px; color: var(--text-secondary);">999 руб/мес</div>
+                </div>
+                
+                <div class="verification-type gold" onclick="selectVerificationType('gold')">
+                    <i class="fas fa-crown"></i>
+                    <h4>Золотая верификация</h4>
+                    <p>Премиум статус</p>
+                    <div style="font-size: 12px; color: var(--text-secondary);">2499 руб/мес</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary btn-block" onclick="proceedToVerificationForm()" style="margin-top: 20px;">
+                Продолжить
+            </button>
+        </div>
+    </div>
+</div>
+    <!-- Модальное окно регистрации/входа -->
+    <div id="authModal" class="modal active">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Добро пожаловать в KNB</h2>
+                <button class="close-modal" onclick="closeAuthModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="loginForm">
+                    <h3>Вход</h3>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" class="form-control" placeholder="Ваш email">
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль</label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="Ваш пароль">
+                    </div>
+                    <button class="btn btn-primary btn-block" onclick="login()">Войти</button>
+                    <p style="text-align: center; margin-top: 15px;">
+                        Нет аккаунта? <a href="#" onclick="showRegisterForm()" style="color: var(--primary-color);">Зарегистрироваться</a>
+                    </p>
+                </div>
+                
+                <div id="registerForm" style="display: none;">
+                    <h3>Регистрация</h3>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="registerEmail" class="form-control" placeholder="Ваш email">
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль</label>
+                        <input type="password" id="registerPassword" class="form-control" placeholder="Придумайте пароль">
+                    </div>
+                    <div class="form-group">
+                        <label>Подтвердите пароль</label>
+                        <input type="password" id="registerConfirmPassword" class="form-control" placeholder="Повторите пароль">
+                    </div>
+                    <button class="btn btn-primary btn-block" onclick="register()">Зарегистрироваться</button>
+                    <p style="text-align: center; margin-top: 15px;">
+                        Уже есть аккаунт? <a href="#" onclick="showLoginForm()" style="color: var(--primary-color);">Войти</a>
+                    </p>
+                </div>
+                
+                <div id="verifyEmailForm" style="display: none;">
+                    <h3>Подтверждение email</h3>
+                    <p>На вашу почту отправлен код подтверждения. Введите его ниже:</p>
+                    <div class="form-group">
+                        <label>Код подтверждения</label>
+                        <input type="text" id="verificationCode" class="form-control" placeholder="6-значный код">
+                    </div>
+                    <button class="btn btn-primary btn-block" onclick="verifyEmail()">Подтвердить</button>
+                </div>
+                
+                <div id="setupProfileForm" style="display: none;">
+                    <h3>Настройка профиля</h3>
+                    <div class="form-group">
+                        <label>Имя пользователя (видно всем)</label>
+                        <input type="text" id="profileName" class="form-control" placeholder="Ваше имя">
+                    </div>
+                    <div class="form-group">
+                        <label>Юзернейм (через @)</label>
+                        <input type="text" id="profileUsername" class="form-control" placeholder="@username">
+                    </div>
+                    <button class="btn btn-primary btn-block" onclick="completeProfileSetup()">Завершить настройку</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Основной интерфейс -->
+    <div id="mainApp" style="display: none;">
+        <header class="header">
+            <div class="container header-container">
+                <a href="#" class="logo" onclick="showMainFeed(event)">KNB</a>
+                
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Поиск людей, постов..." onkeypress="if(event.key=='Enter') search()">
+                </div>
+                
+                <div class="user-menu">
+                    <button class="btn btn-primary" onclick="showCreatePostModal()">
+                        <i class="fas fa-plus"></i> Создать пост
+                    </button>
+                    <div id="notificationIcon" style="position: relative; cursor: pointer;" onclick="toggleNotifications()">
+                        <i class="fas fa-bell" style="font-size: 20px;"></i>
+                        <span id="notificationCount" style="position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 12px; display: none; justify-content: center; align-items: center;">0</span>
+                    </div>
+                    <div id="headerAvatar" class="avatar-letter" onclick="showProfile()"></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <div class="main-layout">
+                <!-- Левая боковая панель -->
+                <div class="left-sidebar sidebar">
+                    <ul class="nav-links">
+                        <li><a href="#" class="active" onclick="showMainFeed(event)"><i class="fas fa-home"></i> <span>Лента</span></a></li>
+                        <li><a href="#" onclick="showProfile()"><i class="fas fa-user"></i> <span>Профиль</span></a></li>
+                        <li><a href="#" onclick="showFriends(event)"><i class="fas fa-users"></i> <span>Друзья</span></a></li>
+                        <li><a href="#" onclick="showMessages(event)"><i class="fas fa-envelope"></i> <span>Сообщения</span></a></li>
+                        <li><a href="#" onclick="showNotificationsPanel(event)"><i class="fas fa-bell"></i> <span>Уведомления</span></a></li>
+                        <li><a href="#" onclick="showSettings(event)"><i class="fas fa-cog"></i> <span>Настройки</span></a></li>
+                        <li><a href="#" onclick="showAdminPanel(event)" id="adminLink" style="display: none;"><i class="fas fa-shield-alt"></i> <span>Админ-панель</span></a></li>
+                        <li><a href="#" onclick="showVerificationPanel(event)"><i class="fas fa-check-circle"></i> <span>Верификация</span></a></li>
+                        <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span>Выйти</span></a></li>
+                    </ul>
+                    
+                    <div class="online-users">
+                        <h3>Онлайн сейчас</h3>
+                        <div id="onlineUsersList"></div>
+                    </div>
+                </div>
+
+                <!-- Центральная часть -->
+                <div class="main-content">
+                    <div id="feedContent"></div>
+                    <div id="profileContent" style="display: none;"></div>
+                    <div id="friendsContent" style="display: none;"></div>
+                    <div id="messagesContent" style="display: none;"></div>
+                    <div id="notificationsContent" style="display: none;"></div>
+                    <div id="settingsContent" style="display: none;"></div>
+                    <div id="adminContent" style="display: none;"></div>
+                    <div id="verificationContent" style="display: none;"></div>
+                </div>
+
+                <!-- Правая боковая панель -->
+                <div class="right-sidebar">
+                    <div class="right-sidebar-section">
+                        <div class="right-sidebar-title">
+                            <h3>Топ кланов</h3>
+                            <a href="#" style="color: var(--primary-color); font-size: 14px;">Все</a>
+                        </div>
+                        <div id="topClans"></div>
+                    </div>
+                    
+                    <div class="right-sidebar-section">
+                        <div class="right-sidebar-title">
+                            <h3>Заявки в друзья</h3>
+                        </div>
+                        <div id="friendRequests"></div>
+                    </div>
+                    
+                    <div class="right-sidebar-section">
+                        <div class="right-sidebar-title">
+                            <h3>Верифицированные пользователи</h3>
+                        </div>
+                        <div id="verifiedUsers"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальные окна -->
+        <div id="createPostModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Создать пост</h2>
+                    <button class="close-modal" onclick="closeCreatePostModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <textarea id="postText" class="form-control" placeholder="Что у вас нового?" rows="4"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mediaFile" class="file-label">
+                            <i class="fas fa-image"></i> Добавить фото/видео
+                        </label>
+                        <input type="file" id="mediaFile" class="file-input" accept="image/*,video/*,audio/*" onchange="previewMedia(event)">
+                        
+                        <div id="filePreview" class="file-preview" style="display: none;"></div>
+                        
+                        <div id="uploadProgress" class="upload-progress" style="display: none;">
+                            <div class="progress-bar" id="progressBar"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="post-actions">
+                        <div class="media-buttons">
+                            <button class="media-btn" onclick="document.getElementById('mediaFile').click()">
+                                <i class="fas fa-image"></i>
+                            </button>
+                            <button class="media-btn" onclick="startVoiceRecording()">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                        </div>
+                        <button class="btn btn-primary" onclick="createPost()">Опубликовать</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="notificationsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Уведомления</h2>
+                    <button class="close-modal" onclick="closeNotificationsModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="notificationsList"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="verificationModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Верификация аккаунта</h2>
+                    <button class="close-modal" onclick="closeVerificationModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="verificationInfo">
+                        <h3>Что дает верификация?</h3>
+                        <ul style="margin-bottom: 20px; padding-left: 20px;">
+                            <li>Синий значок проверки рядом с вашим именем</li>
+                            <li>Повышенный доверие со стороны других пользователей</li>
+                            <li>Приоритет в поиске и рекомендациях</li>
+                            <li>Доступ к эксклюзивным функциям</li>
+                            <li>Возможность создавать верифицированные сообщества</li>
+                        </ul>
+                        
+                        <div id="verificationForm">
+                            <div class="form-group">
+                                <label>Ваше настоящее имя</label>
+                                <input type="text" id="verificationRealName" class="form-control" placeholder="Как в документах">
+                            </div>
+                            <div class="form-group">
+                                <label>Номер документа (паспорт, водительские права)</label>
+                                <input type="text" id="verificationDocument" class="form-control" placeholder="Серия и номер">
+                            </div>
+                            <div class="form-group">
+                                <label>Дополнительная информация</label>
+                                <textarea id="verificationReason" class="form-control" rows="3" placeholder="Расскажите о себе и своих достижениях"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Ссылки для подтверждения</label>
+                                <textarea id="verificationLinks" class="form-control" rows="2" placeholder="По одной ссылке на строку"></textarea>
+                            </div>
+                            <button class="btn btn-success btn-block" onclick="submitVerificationRequest()">Отправить заявку</button>
+                        </div>
+                        
+                        <div id="verificationStatus" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="mediaFullscreen" class="media-fullscreen" style="display: none;" onclick="closeFullscreenMedia()">
+            <button class="close-fullscreen" onclick="closeFullscreenMedia(event)">&times;</button>
+            <div class="media-fullscreen-content" id="fullscreenMediaContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // База данных
+        const KNB_DB = {
+            init: function() {
+                if (!localStorage.getItem('knb_users')) {
+                    const owner = {
+                        id: 1,
+                        email: "admin@knb.com",
+                        password: "admin005",
+                        username: "@Foxi005305",
+                        name: "Foxi",
+                        avatarColor: this.getColorFromName("Foxi"),
+                        bannerColor: "#7289da",
+                        bio: "Основатель KNB | Разработчик | Верифицированный аккаунт",
+                        verified: true,
+                        verificationLevel: "gold",
+                        verificationDate: new Date().toISOString(),
+                        isAdmin: true,
+                        friends: [],
+                        friendRequests: [],
+                        posts: [],
+                        notifications: [],
+                        joined: new Date().toISOString(),
+                        theme: "dark"
+                    };
+                    
+                    const testUsers = [
+                        {
+                            id: 2,
+                            email: "user1@test.com",
+                            password: "123456",
+                            username: "@alex2023",
+                            name: "Алексей",
+                            avatarColor: this.getColorFromName("Алексей"),
+                            bannerColor: "#9b59b6",
+                            bio: "Люблю путешествия и фотографию",
+                            verified: false,
+                            isAdmin: false,
+                            friends: [1],
+                            friendRequests: [],
+                            posts: [],
+                            notifications: [],
+                            joined: new Date().toISOString(),
+                            theme: "dark"
+                        },
+                        {
+                            id: 3,
+                            email: "user2@test.com",
+                            password: "123456",
+                            username: "@maria_art",
+                            name: "Мария",
+                            avatarColor: this.getColorFromName("Мария"),
+                            bannerColor: "#2ecc71",
+                            bio: "Художник и дизайнер",
+                            verified: true,
+                            verificationLevel: "blue",
+                            verificationDate: new Date().toISOString(),
+                            isAdmin: false,
+                            friends: [],
+                            friendRequests: [],
+                            posts: [],
+                            notifications: [],
+                            joined: new Date().toISOString(),
+                            theme: "dark"
+                        }
+                    ];
+                    
+                    localStorage.setItem('knb_users', JSON.stringify([owner, ...testUsers]));
+                }
+                
+                if (!localStorage.getItem('knb_posts')) {
+                    localStorage.setItem('knb_posts', JSON.stringify([]));
+                }
+                
+                if (!localStorage.getItem('knb_clans')) {
+                    const clans = [
+                        {id: 1, name: "Геймеры", members: 7300, verified: true},
+                        {id: 2, name: "Программисты", members: 6200, verified: true},
+                        {id: 3, name: "Художники", members: 4200, verified: true},
+                        {id: 4, name: "Музыканты", members: 3500, verified: false},
+                        {id: 5, name: "Фотографы", members: 2400, verified: true}
+                    ];
+                    localStorage.setItem('knb_clans', JSON.stringify(clans));
+                }
+                
+                if (!localStorage.getItem('knb_messages')) {
+                    localStorage.setItem('knb_messages', JSON.stringify([]));
+                }
+                
+                if (!localStorage.getItem('knb_verification_requests')) {
+                    localStorage.setItem('knb_verification_requests', JSON.stringify([]));
+                }
+            },
+            
+            getColorFromName: function(name) {
+                const colors = ['#7289da', '#43b581', '#faa61a', '#f04747', '#9b59b6', '#3498db', '#2ecc71', '#e74c3c'];
+                let hash = 0;
+                for (let i = 0; i < name.length; i++) {
+                    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                return colors[Math.abs(hash) % colors.length];
+            },
+            
+            getUsers: function() {
+                return JSON.parse(localStorage.getItem('knb_users') || '[]');
+            },
+            
+            getUserById: function(id) {
+                return this.getUsers().find(user => user.id === id);
+            },
+            
+            getUserByEmail: function(email) {
+                return this.getUsers().find(user => user.email === email);
+            },
+            
+            updateUser: function(user) {
+                const users = this.getUsers();
+                const index = users.findIndex(u => u.id === user.id);
+                if (index !== -1) {
+                    users[index] = user;
+                    localStorage.setItem('knb_users', JSON.stringify(users));
+                    return true;
+                }
+                return false;
+            },
+            
+            getPosts: function() {
+                return JSON.parse(localStorage.getItem('knb_posts') || '[]');
+            },
+            
+            addPost: function(post) {
+                const posts = this.getPosts();
+                post.id = posts.length > 0 ? Math.max(...posts.map(p => p.id)) + 1 : 1;
+                posts.unshift(post);
+                localStorage.setItem('knb_posts', JSON.stringify(posts));
+                return post;
+            },
+            
+            updatePost: function(post) {
+                const posts = this.getPosts();
+                const index = posts.findIndex(p => p.id === post.id);
+                if (index !== -1) {
+                    posts[index] = post;
+                    localStorage.setItem('knb_posts', JSON.stringify(posts));
+                    return true;
+                }
+                return false;
+            },
+            
+            deletePost: function(postId) {
+                const posts = this.getPosts();
+                const index = posts.findIndex(p => p.id === postId);
+                if (index !== -1) {
+                    posts.splice(index, 1);
+                    localStorage.setItem('knb_posts', JSON.stringify(posts));
+                    return true;
+                }
+                return false;
+            },
+            
+            getClans: function() {
+                return JSON.parse(localStorage.getItem('knb_clans') || '[]');
+            },
+            
+            getMessages: function() {
+                return JSON.parse(localStorage.getItem('knb_messages') || '[]');
+            },
+            
+            addMessage: function(message) {
+                const messages = this.getMessages();
+                message.id = messages.length > 0 ? Math.max(...messages.map(m => m.id)) + 1 : 1;
+                messages.push(message);
+                localStorage.setItem('knb_messages', JSON.stringify(messages));
+                return message;
+            },
+            
+            getVerificationRequests: function() {
+                return JSON.parse(localStorage.getItem('knb_verification_requests') || '[]');
+            },
+            
+            addVerificationRequest: function(request) {
+                const requests = this.getVerificationRequests();
+                request.id = requests.length > 0 ? Math.max(...requests.map(r => r.id)) + 1 : 1;
+                request.status = 'pending';
+                request.createdAt = new Date().toISOString();
+                requests.push(request);
+                localStorage.setItem('knb_verification_requests', JSON.stringify(requests));
+                return request;
+            },
+            
+            updateVerificationRequest: function(request) {
+                const requests = this.getVerificationRequests();
+                const index = requests.findIndex(r => r.id === request.id);
+                if (index !== -1) {
+                    requests[index] = request;
+                    localStorage.setItem('knb_verification_requests', JSON.stringify(requests));
+                    return true;
+                }
+                return false;
+            }
+        };
+
+        // Глобальные переменные
+        let currentUser = null;
+        let emailVerificationCode = null;
+        let selectedMediaFile = null;
+        let mediaPreviewUrl = null;
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            KNB_DB.init();
+            const savedUser = localStorage.getItem('knb_current_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showMainApp();
+            }
+        });
+
+        // Функции аутентификации
+        function closeAuthModal() {
+            if (!currentUser) return;
+            document.getElementById('authModal').classList.remove('active');
+        }
+
+        function showRegisterForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        }
+
+        function showLoginForm() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('verifyEmailForm').style.display = 'none';
+            document.getElementById('setupProfileForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+
+        function showVerifyEmailForm() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('verifyEmailForm').style.display = 'block';
+        }
+
+        function showSetupProfileForm() {
+            document.getElementById('verifyEmailForm').style.display = 'none';
+            document.getElementById('setupProfileForm').style.display = 'block';
+        }
+
+        function register() {
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            if (!email || !password || !confirmPassword) {
+                alert('Заполните все поля');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('Пароли не совпадают');
+                return;
+            }
+            
+            const existingUser = KNB_DB.getUserByEmail(email);
+            if (existingUser) {
+                alert('Пользователь с таким email уже существует');
+                return;
+            }
+            
+            emailVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+            alert(`Код подтверждения отправлен на ${email}\nКод: ${emailVerificationCode}`);
+            
+            currentUser = {
+                tempEmail: email,
+                tempPassword: password
+            };
+            
+            showVerifyEmailForm();
+        }
+
+        function verifyEmail() {
+            const code = document.getElementById('verificationCode').value;
+            
+            if (code !== emailVerificationCode) {
+                alert('Неверный код подтверждения');
+                return;
+            }
+            
+            showSetupProfileForm();
+        }
+
+        function completeProfileSetup() {
+            const name = document.getElementById('profileName').value;
+            const username = document.getElementById('profileUsername').value;
+            
+            if (!name || !username) {
+                alert('Заполните обязательные поля');
+                return;
+            }
+            
+            if (!username.startsWith('@')) {
+                alert('Юзернейм должен начинаться с @');
+                return;
+            }
+            
+            const users = KNB_DB.getUsers();
+            const newUserId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
+            
+            const newUser = {
+                id: newUserId,
+                email: currentUser.tempEmail,
+                password: currentUser.tempPassword,
+                username: username,
+                name: name,
+                avatarColor: KNB_DB.getColorFromName(name),
+                bannerColor: KNB_DB.getColorFromName(name + "banner"),
+                bio: 'Привет! Я новый пользователь KNB',
+                verified: false,
+                isAdmin: false,
+                friends: [],
+                friendRequests: [],
+                posts: [],
+                notifications: [],
+                joined: new Date().toISOString(),
+                theme: 'dark'
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('knb_users', JSON.stringify(users));
+            
+            currentUser = newUser;
+            localStorage.setItem('knb_current_user', JSON.stringify(currentUser));
+            showMainApp();
+        }
+
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const user = KNB_DB.getUserByEmail(email);
+            
+            if (user && user.password === password) {
+                currentUser = user;
+                localStorage.setItem('knb_current_user', JSON.stringify(currentUser));
+                showMainApp();
+            } else {
+                alert('Неверный email или пароль');
+            }
+        }
+
+        function showMainApp() {
+            document.getElementById('authModal').classList.remove('active');
+            document.getElementById('mainApp').style.display = 'block';
+            updateHeaderAvatar();
+            
+            if (currentUser.isAdmin) {
+                document.getElementById('adminLink').style.display = 'block';
+            }
+            
+            showMainFeed();
+            loadOnlineUsers();
+            loadTopClans();
+            loadFriendRequests();
+            loadVerifiedUsers();
+            updateNotificationCount();
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('knb_current_user');
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('authModal').classList.add('active');
+            showLoginForm();
+        }
+
+        function updateHeaderAvatar() {
+            const headerAvatar = document.getElementById('headerAvatar');
+            headerAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
+            headerAvatar.style.backgroundColor = currentUser.avatarColor;
+        }
+
+        // Функции ленты
+        function showMainFeed(event) {
+            if (event) event.preventDefault();
+            document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+            if (event && event.target.closest('a')) {
+                event.target.closest('a').classList.add('active');
+            } else {
+                document.querySelector('.nav-links li:first-child a').classList.add('active');
+            }
+            
+            document.getElementById('feedContent').style.display = 'block';
+            document.getElementById('profileContent').style.display = 'none';
+            document.getElementById('friendsContent').style.display = 'none';
+            document.getElementById('messagesContent').style.display = 'none';
+            document.getElementById('notificationsContent').style.display = 'none';
+            document.getElementById('settingsContent').style.display = 'none';
+            document.getElementById('adminContent').style.display = 'none';
+            document.getElementById('verificationContent').style.display = 'none';
+            
+            loadFeed();
+        }
+
+        function loadFeed() {
+            const feedContent = document.getElementById('feedContent');
+            const posts = KNB_DB.getPosts();
+            
+            feedContent.innerHTML = `
+                <div class="create-post">
+                    <div class="post-input">
+                        <div class="avatar-letter" style="background-color: ${currentUser.avatarColor}">
+                            ${currentUser.name.charAt(0).toUpperCase()}
+                        </div>
+                        <textarea id="quickPostText" placeholder="Что у вас нового?"></textarea>
+                    </div>
+                    <div class="post-actions">
+                        <div class="media-buttons">
+                            <button class="media-btn" onclick="showCreatePostModal()">
+                                <i class="fas fa-image"></i>
+                            </button>
+                        </div>
+                        <button class="post-btn" onclick="quickCreatePost()">Опубликовать</button>
+                    </div>
+                </div>
+                <div id="postsContainer"></div>
+            `;
+            
+            const postsContainer = document.getElementById('postsContainer');
+            
+            if (posts.length === 0) {
+                postsContainer.innerHTML = '<p style="text-align: center; padding: 40px; color: var(--text-secondary);">Пока нет постов. Будьте первым!</p>';
+                return;
+            }
+            
+            posts.forEach(post => {
+                const postUser = KNB_DB.getUserById(post.userId);
+                const isLiked = post.likes && post.likes.includes(currentUser.id);
+                const isVerified = postUser && postUser.verified;
+                const verificationLevel = postUser ? postUser.verificationLevel : null;
+                const canDelete = currentUser.id === post.userId || currentUser.isAdmin;
+                
+                const postElement = document.createElement('div');
+                postElement.className = 'post';
+                postElement.innerHTML = `
+                    ${canDelete ? `<button class="post-delete-btn" onclick="deletePost(${post.id})"><i class="fas fa-trash"></i></button>` : ''}
+                    <div class="post-header">
+                        <div class="post-avatar" style="background-color: ${post.avatarColor}" onclick="showUserProfile(${post.userId})">
+                            ${post.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="post-user-info">
+                            <div class="post-username">
+                                ${post.name}
+                                ${isVerified ? `<i class="fas fa-check-circle verified-badge" title="Верифицированный аккаунт"></i>` : ''}
+                                ${verificationLevel === 'gold' ? '<span class="verification-badge" title="Золотая верификация"><i class="fas fa-crown"></i> Gold</span>' : ''}
+                                ${postUser && postUser.isAdmin ? '<span class="admin-badge" title="Администратор"><i class="fas fa-shield-alt"></i> Админ</span>' : ''}
+                            </div>
+                            <div class="post-time">${formatTime(post.timestamp)} • ${post.username}</div>
+                        </div>
+                    </div>
+                    <div class="post-content">${post.content}</div>
+                    ${post.media ? getMediaHTML(post.media, post.mediaType) : ''}
+                    <div class="post-actions-bar">
+                        <button class="post-action ${isLiked ? 'liked' : ''}" onclick="likePost(${post.id})">
+                            <i class="fas fa-heart"></i> <span>${post.likes ? post.likes.length : 0}</span>
+                        </button>
+                        <button class="post-action" onclick="toggleComments(${post.id})">
+                            <i class="fas fa-comment"></i> <span>${post.comments ? post.comments.length : 0}</span>
+                        </button>
+                    </div>
+                    <div class="comments-section" id="comments-${post.id}" style="display: none;">
+                        <div class="comment-input">
+                            <div class="comment-avatar" style="background-color: ${currentUser.avatarColor}">
+                                ${currentUser.name.charAt(0).toUpperCase()}
+                            </div>
+                            <input type="text" id="comment-input-${post.id}" placeholder="Напишите комментарий...">
+                            <button class="btn btn-primary" onclick="addComment(${post.id})">Отправить</button>
+                        </div>
+                        <div id="comments-list-${post.id}">
+                            ${post.comments ? post.comments.map(comment => {
+                                const commentUser = KNB_DB.getUserById(comment.userId);
+                                return `
+                                    <div class="comment">
+                                        <div class="comment-avatar" style="background-color: ${commentUser ? commentUser.avatarColor : '#7289da'}">
+                                            ${comment.name.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div class="comment-content">
+                                            <div class="comment-author">${comment.name}</div>
+                                            <div>${comment.content}</div>
+                                            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">
+                                                ${formatTime(comment.timestamp)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('') : ''}
+                        </div>
+                    </div>
+                `;
+                postsContainer.appendChild(postElement);
+            });
+        }
+
+        function getMediaHTML(mediaData, mediaType) {
+            if (!mediaData) return '';
+            
+            if (mediaType === 'image') {
+                return `<img src="${mediaData}" alt="Пост" class="post-image" onclick="openFullscreenMedia('${mediaData}', 'image')">`;
+            } else if (mediaType === 'video') {
+                return `<video controls class="post-video" onclick="openFullscreenMedia('${mediaData}', 'video')">
+                    <source src="${mediaData}" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>`;
+            } else if (mediaType === 'audio') {
+                return `<audio controls class="post-audio">
+                    <source src="${mediaData}" type="audio/mpeg">
+                    Ваш браузер не поддерживает аудио.
+                </audio>`;
+            }
+            return '';
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return 'только что';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)} мин назад`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)} ч назад`;
+            return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
+        }
+
+        function quickCreatePost() {
+            const text = document.getElementById('quickPostText').value;
+            if (!text.trim()) {
+                alert('Введите текст поста');
+                return;
+            }
+            
+            const newPost = {
+                userId: currentUser.id,
+                username: currentUser.username,
+                name: currentUser.name,
+                avatarColor: currentUser.avatarColor,
+                content: text,
+                media: null,
+                mediaType: null,
+                likes: [],
+                comments: [],
+                timestamp: new Date().toISOString()
+            };
+            
+            KNB_DB.addPost(newPost);
+            document.getElementById('quickPostText').value = '';
+            loadFeed();
+        }
+
+        // Функции постов
+        function showCreatePostModal() {
+            document.getElementById('createPostModal').classList.add('active');
+            selectedMediaFile = null;
+            mediaPreviewUrl = null;
+            document.getElementById('filePreview').style.display = 'none';
+            document.getElementById('mediaFile').value = '';
+            document.getElementById('postText').value = '';
+        }
+
+        function closeCreatePostModal() {
+            document.getElementById('createPostModal').classList.remove('active');
+            if (mediaPreviewUrl) {
+                URL.revokeObjectURL(mediaPreviewUrl);
+                mediaPreviewUrl = null;
+            }
+        }
+
+        function previewMedia(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Файл слишком большой. Максимальный размер: 10MB');
+                event.target.value = '';
+                return;
+            }
+            
+            selectedMediaFile = file;
+            
+            if (mediaPreviewUrl) {
+                URL.revokeObjectURL(mediaPreviewUrl);
+            }
+            
+            mediaPreviewUrl = URL.createObjectURL(file);
+            const preview = document.getElementById('filePreview');
+            preview.style.display = 'block';
+            
+            if (file.type.startsWith('image/')) {
+                preview.innerHTML = `<img src="${mediaPreviewUrl}" alt="Превью">`;
+            } else if (file.type.startsWith('video/')) {
+                preview.innerHTML = `<video controls><source src="${mediaPreviewUrl}" type="${file.type}"></video>`;
+            } else if (file.type.startsWith('audio/')) {
+                preview.innerHTML = `<audio controls><source src="${mediaPreviewUrl}" type="${file.type}"></audio>`;
+            }
+        }
+
+        function createPost() {
+            const text = document.getElementById('postText').value;
+            
+            if (!text.trim() && !selectedMediaFile) {
+                alert('Введите текст или добавьте медиа');
+                return;
+            }
+            
+            const progressBar = document.getElementById('progressBar');
+            const uploadProgress = document.getElementById('uploadProgress');
+            uploadProgress.style.display = 'block';
+            progressBar.style.width = '0%';
+            
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 10;
+                progressBar.style.width = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    
+                    const reader = new FileReader();
+                    
+                    reader.onloadend = function() {
+                        const mediaData = reader.result;
+                        const mediaType = selectedMediaFile.type.startsWith('image/') ? 'image' : 
+                                         selectedMediaFile.type.startsWith('video/') ? 'video' : 'audio';
+                        
+                        const newPost = {
+                            userId: currentUser.id,
+                            username: currentUser.username,
+                            name: currentUser.name,
+                            avatarColor: currentUser.avatarColor,
+                            content: text,
+                            media: mediaData,
+                            mediaType: mediaType,
+                            likes: [],
+                            comments: [],
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        KNB_DB.addPost(newPost);
+                        closeCreatePostModal();
+                        loadFeed();
+                        uploadProgress.style.display = 'none';
+                        
+                        if (mediaPreviewUrl) {
+                            URL.revokeObjectURL(mediaPreviewUrl);
+                            mediaPreviewUrl = null;
+                        }
+                    };
+                    
+                    if (selectedMediaFile) {
+                        reader.readAsDataURL(selectedMediaFile);
+                    } else {
+                        const newPost = {
+                            userId: currentUser.id,
+                            username: currentUser.username,
+                            name: currentUser.name,
+                            avatarColor: currentUser.avatarColor,
+                            content: text,
+                            media: null,
+                            mediaType: null,
+                            likes: [],
+                            comments: [],
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        KNB_DB.addPost(newPost);
+                        closeCreatePostModal();
+                        loadFeed();
+                        uploadProgress.style.display = 'none';
+                    }
+                }
+            }, 50);
+        }
+
+        function deletePost(postId) {
+            if (!confirm('Вы уверены, что хотите удалить этот пост?')) return;
+            
+            const post = KNB_DB.getPosts().find(p => p.id === postId);
+            if (!post) return;
+            
+            if (post.userId !== currentUser.id && !currentUser.isAdmin) {
+                alert('Вы не можете удалить этот пост');
+                return;
+            }
+            
+            KNB_DB.deletePost(postId);
+            loadFeed();
+            alert('Пост удален');
+        }
+
+        function likePost(postId) {
+            const posts = KNB_DB.getPosts();
+            const post = posts.find(p => p.id === postId);
+            
+            if (!post) return;
+            
+            if (!post.likes) post.likes = [];
+            
+            const likeIndex = post.likes.indexOf(currentUser.id);
+            if (likeIndex === -1) {
+                post.likes.push(currentUser.id);
+            } else {
+                post.likes.splice(likeIndex, 1);
+            }
+            
+            KNB_DB.updatePost(post);
+            loadFeed();
+        }
+
+        function toggleComments(postId) {
+            const commentsSection = document.getElementById(`comments-${postId}`);
+            if (commentsSection.style.display === 'none') {
+                commentsSection.style.display = 'block';
+            } else {
+                commentsSection.style.display = 'none';
+            }
+        }
+
+        function addComment(postId) {
+            const commentInput = document.getElementById(`comment-input-${postId}`);
+            const commentText = commentInput.value.trim();
+            
+            if (!commentText) {
+                alert('Введите текст комментария');
+                return;
+            }
+            
+            const posts = KNB_DB.getPosts();
+            const post = posts.find(p => p.id === postId);
+            
+            if (!post) return;
+            
+            if (!post.comments) post.comments = [];
+            
+            const newComment = {
+                id: post.comments.length + 1,
+                userId: currentUser.id,
+                name: currentUser.name,
+                content: commentText,
+                timestamp: new Date().toISOString()
+            };
+            
+            post.comments.push(newComment);
+            KNB_DB.updatePost(post);
+            
+            commentInput.value = '';
+            loadFeed();
+        }
+
+        // Профиль
+        function showProfile(userId = null) {
+            const targetUserId = userId || currentUser.id;
+            
+            document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+            event.target.closest('a').classList.add('active');
+            
+            document.getElementById('feedContent').style.display = 'none';
+            document.getElementById('profileContent').style.display = 'block';
+            document.getElementById('friendsContent').style.display = 'none';
+            document.getElementById('messagesContent').style.display = 'none';
+            document.getElementById('notificationsContent').style.display = 'none';
+            document.getElementById('settingsContent').style.display = 'none';
+            document.getElementById('adminContent').style.display = 'none';
+            document.getElementById('verificationContent').style.display = 'none';
+            
+            const user = KNB_DB.getUserById(targetUserId);
+            if (!user) return;
+            
+            const isOwnProfile = user.id === currentUser.id;
+            const isFriend = currentUser.friends && currentUser.friends.includes(user.id);
+            
+            let verificationStatus = '';
+            if (user.verified) {
+                let levelText = '';
+                if (user.verificationLevel === 'gold') levelText = ' (Золотая)';
+                else if (user.verificationLevel === 'silver') levelText = ' (Серебряная)';
+                
+                verificationStatus = `
+                    <div style="margin-top: 10px; padding: 10px; background-color: rgba(29, 161, 242, 0.1); border-radius: 8px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-check-circle" style="color: var(--verified-color);"></i>
+                            <div>
+                                <div style="font-weight: bold;">Верифицированный аккаунт${levelText}</div>
+                                <div style="font-size: 14px; color: var(--text-secondary);">
+                                    Верифицирован ${formatTime(user.verificationDate)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            const profileContent = document.getElementById('profileContent');
+            profileContent.innerHTML = `
+                <div class="profile-header">
+                    <div class="profile-banner" style="background: ${user.bannerColor};">
+                        <div class="profile-avatar" style="background-color: ${user.avatarColor}">
+                            ${user.name.charAt(0).toUpperCase()}
+                        </div>
+                    </div>
+                    <div class="profile-info">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div class="profile-name">
+                                    ${user.name}
+                                    ${user.verified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}
+                                    ${user.verificationLevel === 'gold' ? '<span class="verification-badge" title="Золотая верификация"><i class="fas fa-crown"></i> Gold</span>' : ''}
+                                    ${user.isAdmin ? '<span class="admin-badge" title="Администратор"><i class="fas fa-shield-alt"></i> Админ</span>' : ''}
+                                </div>
+                                <div class="profile-username">${user.username}</div>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                ${!isOwnProfile ? `
+                                    ${isFriend ? 
+                                        '<button class="btn btn-primary" onclick="removeFriend(' + user.id + ')"><i class="fas fa-user-check"></i> Друг</button>' : 
+                                        '<button class="btn btn-primary" onclick="sendFriendRequest(' + user.id + ')"><i class="fas fa-user-plus"></i> Добавить в друзья</button>'
+                                    }
+                                    <button class="btn" style="background: var(--darker-bg);" onclick="sendMessageToUser(${user.id})"><i class="fas fa-envelope"></i> Сообщение</button>
+                                ` : `
+                                    <button class="btn btn-primary" onclick="showSettings(event)"><i class="fas fa-cog"></i> Настройки профиля</button>
+                                    ${!user.verified ? '<button class="btn btn-success" onclick="showVerificationModal()"><i class="fas fa-check-circle"></i> Запросить верификацию</button>' : ''}
+                                `}
+                            </div>
+                        </div>
+                        
+                        ${verificationStatus}
+                        
+                        <div class="profile-bio">
+                            ${user.bio || 'Пользователь еще не добавил описание.'}
+                        </div>
+                        
+                        <div class="profile-stats">
+                            <div class="stat">
+                                <span class="stat-value">${user.friends ? user.friends.length : 0}</span>
+                                <span class="stat-label">Друзей</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">${user.posts ? user.posts.length : 0}</span>
+                                <span class="stat-label">Постов</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">${new Date(user.joined).getFullYear()}</span>
+                                <span class="stat-label">Год регистрации</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">${user.verified ? 'Да' : 'Нет'}</span>
+                                <span class="stat-label">Верификация</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 style="margin: 20px 0 10px;">Посты пользователя</h3>
+                <div id="userPostsContainer"></div>
+            `;
+            
+            const posts = KNB_DB.getPosts();
+            const userPosts = posts.filter(post => post.userId === user.id);
+            const userPostsContainer = document.getElementById('userPostsContainer');
+            
+            if (userPosts.length === 0) {
+                userPostsContainer.innerHTML = '<p style="text-align: center; padding: 40px; color: var(--text-secondary);">У пользователя пока нет постов</p>';
+                return;
+            }
+            
+            userPosts.forEach(post => {
+                const isLiked = post.likes && post.likes.includes(currentUser.id);
+                const isVerified = user.verified;
+                
+                const postElement = document.createElement('div');
+                postElement.className = 'post';
+                postElement.innerHTML = `
+                    <div class="post-header">
+                        <div class="post-avatar" style="background-color: ${post.avatarColor}" onclick="showUserProfile(${post.userId})">
+                            ${post.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="post-user-info">
+                            <div class="post-username">
+                                ${post.name}
+                                ${isVerified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}
+                                ${user.verificationLevel === 'gold' ? '<span class="verification-badge"><i class="fas fa-crown"></i> Gold</span>' : ''}
+                                ${user.isAdmin ? '<span class="admin-badge"><i class="fas fa-shield-alt"></i> Админ</span>' : ''}
+                            </div>
+                            <div class="post-time">${formatTime(post.timestamp)} • ${post.username}</div>
+                        </div>
+                    </div>
+                    <div class="post-content">${post.content}</div>
+                    ${post.media ? getMediaHTML(post.media, post.mediaType) : ''}
+                    <div class="post-actions-bar">
+                        <button class="post-action ${isLiked ? 'liked' : ''}" onclick="likePost(${post.id})">
+                            <i class="fas fa-heart"></i> <span>${post.likes ? post.likes.length : 0}</span>
+                        </button>
+                        <button class="post-action" onclick="toggleComments(${post.id})">
+                            <i class="fas fa-comment"></i> <span>${post.comments ? post.comments.length : 0}</span>
+                        </button>
+                    </div>
+                `;
+                userPostsContainer.appendChild(postElement);
+            });
+        }
+
+        function showUserProfile(userId) {
+            showProfile(userId);
+        }
+
+        // Друзья
+        function sendFriendRequest(userId) {
+            const user = KNB_DB.getUserById(userId);
+            if (!user) return;
+            
+            if (!user.friendRequests) user.friendRequests = [];
+            
+            if (user.friendRequests.includes(currentUser.id)) {
+                alert('Вы уже отправили заявку этому пользователю');
+                return;
+            }
+            
+            user.friendRequests.push(currentUser.id);
+            KNB_DB.updateUser(user);
+            
+            alert('Заявка в друзья отправлена');
+            showProfile(userId);
+            loadFriendRequests();
+        }
+
+        function acceptFriendRequest(userId) {
+            const sender = KNB_DB.getUserById(userId);
+            if (!sender) return;
+            
+            if (currentUser.friendRequests) {
+                const requestIndex = currentUser.friendRequests.indexOf(userId);
+                if (requestIndex !== -1) {
+                    currentUser.friendRequests.splice(requestIndex, 1);
+                }
+            }
+            
+            if (!currentUser.friends) currentUser.friends = [];
+            if (!sender.friends) sender.friends = [];
+            
+            if (!currentUser.friends.includes(userId)) {
+                currentUser.friends.push(userId);
+            }
+            
+            if (!sender.friends.includes(currentUser.id)) {
+                sender.friends.push(currentUser.id);
+            }
+            
+            KNB_DB.updateUser(currentUser);
+            KNB_DB.updateUser(sender);
+            
+            alert(`Теперь вы дружите с ${sender.name}`);
+            loadFriendRequests();
+        }
+
+        function declineFriendRequest(userId) {
+            const sender = KNB_DB.getUserById(userId);
+            if (!sender) return;
+            
+            if (currentUser.friendRequests) {
+                const requestIndex = currentUser.friendRequests.indexOf(userId);
+                if (requestIndex !== -1) {
+                    currentUser.friendRequests.splice(requestIndex, 1);
+                }
+            }
+            
+            KNB_DB.updateUser(currentUser);
+            
+            alert(`Заявка от ${sender.name} отклонена`);
+            loadFriendRequests();
+        }
+
+        function removeFriend(userId) {
+            const user = KNB_DB.getUserById(userId);
+            if (!user) return;
+            
+            if (currentUser.friends) {
+                const friendIndex = currentUser.friends.indexOf(userId);
+                if (friendIndex !== -1) {
+                    currentUser.friends.splice(friendIndex, 1);
+                }
+            }
+            
+            if (user.friends) {
+                const friendIndex = user.friends.indexOf(currentUser.id);
+                if (friendIndex !== -1) {
+                    user.friends.splice(friendIndex, 1);
+                }
+            }
+            
+            KNB_DB.updateUser(currentUser);
+            KNB_DB.updateUser(user);
+            
+            alert(`Вы больше не дружите с ${user.name}`);
+            showProfile(userId);
+        }
+
+        function showFriends(event) {
+            if (event) event.preventDefault();
+            document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+            event.target.closest('a').classList.add('active');
+            
+            document.getElementById('feedContent').style.display = 'none';
+            document.getElementById('profileContent').style.display = 'none';
+            document.getElementById('friendsContent').style.display = 'block';
+            document.getElementById('messagesContent').style.display = 'none';
+            document.getElementById('notificationsContent').style.display = 'none';
+            document.getElementById('settingsContent').style.display = 'none';
+            document.getElementById('adminContent').style.display = 'none';
+            document.getElementById('verificationContent').style.display = 'none';
+            
+            const users = KNB_DB.getUsers();
+            const friends = users.filter(user => currentUser.friends && currentUser.friends.includes(user.id));
+            
+            document.getElementById('friendsContent').innerHTML = `
+                <div class="right-sidebar-section">
+                    <div class="right-sidebar-title">
+                        <h3>Мои друзья (${friends.length})</h3>
+                    </div>
+                    <div id="friendsList">
+                        ${friends.length > 0 ? friends.map(friend => `
+                            <div class="friend-request">
+                                <div class="avatar-letter" style="background-color: ${friend.avatarColor}" onclick="showUserProfile(${friend.id})" style="cursor: pointer;">
+                                    ${friend.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div style="flex: 1; cursor: pointer;" onclick="showUserProfile(${friend.id})">
+                                    <div style="font-weight: bold; display: flex; align-items: center; gap: 5px;">
+                                        ${friend.name}
+                                        ${friend.verified ? '<i class="fas fa-check-circle verified-badge" style="font-size: 12px;"></i>' : ''}
+                                    </div>
+                                    <div style="font-size: 14px; color: var(--text-secondary);">${friend.username}</div>
+                                </div>
+                                <div style="display: flex; gap: 5px;">
+                                    <button class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;" onclick="sendMessageToUser(${friend.id})"><i class="fas fa-envelope"></i></button>
+                                    <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="removeFriend(${friend.id})"><i class="fas fa-user-times"></i></button>
+                                </div>
+                            </div>
+                        `).join('') : '<p style="color: var(--text-secondary); text-align: center; padding: 10px;">У вас пока нет друзей</p>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Верификация
+        function showVerificationPanel(event) {
+            if (event) event.preventDefault();
+            document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+            event.target.closest('a').classList.add('active');
+            
+            document.getElementById('feedContent').style.display = 'none';
+            document.getElementById('profileContent').style.display = 'none';
+            document.getElementById('friendsContent').style.display = 'none';
+            document.getElementById('messagesContent').style.display = 'none';
+            document.getElementById('notificationsContent').style.display = 'none';
+            document.getElementById('settingsContent').style.display = 'none';
+            document.getElementById('adminContent').style.display = 'none';
+            document.getElementById('verificationContent').style.display = 'block';
+            
+            const verificationContent = document.getElementById('verificationContent');
+            
+            if (currentUser.verified) {
+                let levelText = '';
+                let levelColor = '';
+                if (currentUser.verificationLevel === 'gold') {
+                    levelText = 'Золотая верификация';
+                    levelColor = 'gold';
+                } else if (currentUser.verificationLevel === 'silver') {
+                    levelText = 'Серебряная верификация';
+                    levelColor = 'silver';
+                } else {
+                    levelText = 'Синяя верификация';
+                    levelColor = '#1DA1F2';
+                }
+                
+                verificationContent.innerHTML = `
+                    <div class="admin-panel">
+                        <h2>Статус верификации</h2>
+                        <div style="text-align: center; padding: 40px 20px;">
+                            <div style="font-size: 80px; color: ${levelColor}; margin-bottom: 20px;">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h3 style="color: ${levelColor};">${levelText}</h3>
+                            <p>Ваш аккаунт успешно верифицирован!</p>
+                            <p style="color: var(--text-secondary);">Дата верификации: ${formatTime(currentUser.verificationDate)}</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                verificationContent.innerHTML = `
+                    <div class="admin-panel">
+                        <h2>Получите значок проверки</h2>
+                        <div style="text-align: center; padding: 40px 20px;">
+                            <div style="font-size: 80px; color: var(--text-secondary); margin-bottom: 20px;">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <h3>Верификация аккаунта</h3>
+                            <p>Верификация подтверждает подлинность вашего аккаунта и дает дополнительные возможности.</p>
+                            
+                            <button class="btn btn-success" style="margin-top: 40px; padding: 15px 30px; font-size: 18px;" onclick="showVerificationModal()">
+                                <i class="fas fa-check-circle"></i> Подать заявку на верификацию
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function showVerificationModal() {
+            document.getElementById('verificationModal').classList.add('active');
+            document.getElementById('verificationForm').style.display = 'block';
+            document.getElementById('verificationStatus').style.display = 'none';
+        }
+
+        function closeVerificationModal() {
+            document.getElementById('verificationModal').classList.remove('active');
+        }
+
+        function submitVerificationRequest() {
+            const realName = document.getElementById('verificationRealName').value;
+            const document = document.getElementById('verificationDocument').value;
+            const reason = document.getElementById('verificationReason').value;
+            const links = document.getElementById('verificationLinks').value;
+            
+            if (!realName || !document || !reason) {
+                alert('Заполните обязательные поля');
+                return;
+            }
+            
+            const verificationRequest = {
+                userId: currentUser.id,
+                realName: realName,
+                document: document,
+                reason: reason,
+                links: links,
+                status: 'pending',
+                submitted: new Date().toISOString()
+            };
+            
+            KNB_DB.addVerificationRequest(verificationRequest);
+            
+            currentUser.verificationRequest = verificationRequest;
+            KNB_DB.updateUser(currentUser);
+            
+            alert('Заявка на верификацию отправлена! Мы рассмотрим ее в ближайшее время.');
+            closeVerificationModal();
+            showVerificationPanel();
+        }
+
+        // Админ-панель
+        function showAdminPanel(event) {
+            if (event) event.preventDefault();
+            if (!currentUser.isAdmin) {
+                alert('Доступ запрещен');
+                return;
+            }
+            
+            document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+            event.target.closest('a').classList.add('active');
+            
+            document.getElementById('feedContent').style.display = 'none';
+            document.getElementById('profileContent').style.display = 'none';
+            document.getElementById('friendsContent').style.display = 'none';
+            document.getElementById('messagesContent').style.display = 'none';
+            document.getElementById('notificationsContent').style.display = 'none';
+            document.getElementById('settingsContent').style.display = 'none';
+            document.getElementById('verificationContent').style.display = 'none';
+            document.getElementById('adminContent').style.display = 'block';
+            
+            const users = KNB_DB.getUsers();
+            const verificationRequests = KNB_DB.getVerificationRequests();
+            
+            document.getElementById('adminContent').innerHTML = `
+                <div class="admin-panel">
+                    <h2>Админ-панель</h2>
+                    <p>Добро пожаловать, ${currentUser.name}! Вы вошли как администратор.</p>
+                    
+                    <div class="admin-section">
+                        <h3>Статистика</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                            <div class="right-sidebar-section">
+                                <div class="stat-value">${users.length}</div>
+                                <div class="stat-label">Пользователей</div>
+                            </div>
+                            <div class="right-sidebar-section">
+                                <div class="stat-value">${KNB_DB.getPosts().length}</div>
+                                <div class="stat-label">Постов</div>
+                            </div>
+                            <div class="right-sidebar-section">
+                                <div class="stat-value">${users.filter(u => u.verified).length}</div>
+                                <div class="stat-label">Верифицированных</div>
+                            </div>
+                            <div class="right-sidebar-section">
+                                <div class="stat-value">${verificationRequests.filter(r => r.status === 'pending').length}</div>
+                                <div class="stat-label">Заявок на верификацию</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="admin-section">
+                        <h3>Заявки на верификацию</h3>
+                        <div id="verificationRequestsList">
+                            ${verificationRequests.filter(r => r.status === 'pending').length > 0 ? 
+                                verificationRequests.filter(r => r.status === 'pending').map(request => {
+                                    const user = KNB_DB.getUserById(request.userId);
+                                    if (!user) return '';
+                                    
+                                    return `
+                                        <div style="background-color: var(--darker-bg); padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                                <div class="avatar-letter" style="background-color: ${user.avatarColor}">
+                                                    ${user.name.charAt(0).toUpperCase()}
+                                                </div>
+                                                <div>
+                                                    <div style="font-weight: bold;">${user.name}</div>
+                                                    <div style="font-size: 14px; color: var(--text-secondary);">${user.username}</div>
+                                                </div>
+                                            </div>
+                                            <div style="font-size: 14px; margin-bottom: 10px;">
+                                                <strong>Имя:</strong> ${request.realName}<br>
+                                                <strong>Документ:</strong> ${request.document}<br>
+                                                <strong>Причина:</strong> ${request.reason}<br>
+                                                <strong>Ссылки:</strong> ${request.links || 'Нет'}
+                                            </div>
+                                            <div style="display: flex; gap: 5px;">
+                                                <button class="btn btn-success btn-sm" onclick="approveVerification(${user.id}, 'blue')">Одобрить Blue</button>
+                                                <button class="btn btn-success btn-sm" onclick="approveVerification(${user.id}, 'silver')">Одобрить Silver</button>
+                                                <button class="btn btn-success btn-sm" onclick="approveVerification(${user.id}, 'gold')">Одобрить Gold</button>
+                                                <button class="btn btn-danger btn-sm" onclick="rejectVerification(${user.id})">Отклонить</button>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('') : 
+                                '<p style="color: var(--text-secondary); text-align: center; padding: 10px;">Нет заявок на верификацию</p>'
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function approveVerification(userId, level) {
+            const user = KNB_DB.getUserById(userId);
+            if (!user) return;
+            
+            user.verified = true;
+            user.verificationLevel = level;
+            user.verificationDate = new Date().toISOString();
+            
+            KNB_DB.updateUser(user);
+            
+            const requests = KNB_DB.getVerificationRequests();
+            const request = requests.find(r => r.userId === userId && r.status === 'pending');
+            if (request) {
+                request.status = 'approved';
+                request.approvedBy = currentUser.id;
+                request.approvedAt = new Date().toISOString();
+                localStorage.setItem('knb_verification_requests', JSON.stringify(requests));
+            }
+            
+            alert(`Пользователь ${user.name} верифицирован`);
+            showAdminPanel();
+        }
+
+        function rejectVerification(userId) {
+            const user = KNB_DB.getUserById(userId);
+            if (!user) return;
+            
+            const requests = KNB_DB.getVerificationRequests();
+            const request = requests.find(r => r.userId === userId && r.status === 'pending');
+            if (request) {
+                request.status = 'rejected';
+                request.rejectedBy = currentUser.id;
+                request.rejectedAt = new Date().toISOString();
+                localStorage.setItem('knb_verification_requests', JSON.stringify(requests));
+            }
+            
+            alert(`Заявка на верификацию от ${user.name} отклонена`);
+            showAdminPanel();
+        }
+
+        // Вспомогательные функции
+        function loadOnlineUsers() {
+            const users = KNB_DB.getUsers();
+            const onlineUsersList = document.getElementById('onlineUsersList');
+            
+            const onlineUsers = users
+                .filter(user => user.id !== currentUser.id)
+                .slice(0, 5);
+            
+            onlineUsersList.innerHTML = onlineUsers.map(user => `
+                <div class="user-item" onclick="showUserProfile(${user.id})">
+                    <div class="avatar-letter" style="background-color: ${user.avatarColor}">
+                        ${user.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                        <div style="font-weight: bold; display: flex; align-items: center; gap: 5px;">
+                            ${user.name}
+                            ${user.verified ? '<i class="fas fa-check-circle verified-badge" style="font-size: 12px;"></i>' : ''}
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">${user.username}</div>
+                    </div>
+                    <div class="online-indicator"></div>
+                </div>
+            `).join('');
+        }
+
+        function loadTopClans() {
+            const clans = KNB_DB.getClans();
+            const topClans = document.getElementById('topClans');
+            
+            topClans.innerHTML = clans.slice(0, 3).map((clan, index) => `
+                <div class="trending-item">
+                    <div style="font-weight: bold; font-size: 18px;">${index + 1}</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: bold; display: flex; align-items: center; gap: 5px;">
+                            ${clan.name}
+                            ${clan.verified ? '<i class="fas fa-check-circle verified-badge" style="font-size: 12px;"></i>' : ''}
+                        </div>
+                        <div style="font-size: 14px; color: var(--text-secondary);">${clan.members.toLocaleString()} участников</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadVerifiedUsers() {
+            const users = KNB_DB.getUsers();
+            const verifiedUsers = document.getElementById('verifiedUsers');
+            const verified = users.filter(user => user.verified).slice(0, 3);
+            
+            if (verified.length > 0) {
+                verifiedUsers.innerHTML = verified.map(user => `
+                    <div class="trending-item" onclick="showUserProfile(${user.id})" style="cursor: pointer;">
+                        <div class="avatar-letter" style="background-color: ${user.avatarColor}">
+                            ${user.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; display: flex; align-items: center; gap: 5px;">
+                                ${user.name}
+                                <i class="fas fa-check-circle verified-badge" style="font-size: 12px;"></i>
+                            </div>
+                            <div style="font-size: 14px; color: var(--text-secondary);">${user.username}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                verifiedUsers.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 10px;">Пока нет верифицированных пользователей</p>';
+            }
+        }
+
+        function loadFriendRequests() {
+            const friendRequests = document.getElementById('friendRequests');
+            
+            if (currentUser.friendRequests && currentUser.friendRequests.length > 0) {
+                const requests = currentUser.friendRequests.slice(0, 3).map(requestId => {
+                    const user = KNB_DB.getUserById(requestId);
+                    return user ? `
+                        <div class="friend-request">
+                            <div class="avatar-letter" style="background-color: ${user.avatarColor}">
+                                ${user.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: bold; display: flex; align-items: center; gap: 5px;">
+                                    ${user.name}
+                                    ${user.verified ? '<i class="fas fa-check-circle verified-badge" style="font-size: 12px;"></i>' : ''}
+                                </div>
+                                <div style="font-size: 14px; color: var(--text-secondary);">${user.username}</div>
+                            </div>
+                            <div style="display: flex; gap: 5px;">
+                                <button class="btn btn-success" style="padding: 5px 10px; font-size: 12px;" onclick="acceptFriendRequest(${user.id})">✓</button>
+                                <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="declineFriendRequest(${user.id})">✗</button>
+                            </div>
+                        </div>
+                    ` : '';
+                }).join('');
+                
+                friendRequests.innerHTML = requests;
+            } else {
+                friendRequests.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 10px;">Нет заявок в друзья</p>';
+            }
+        }
+
+        function updateNotificationCount() {
+            const unreadCount = currentUser.notifications ? currentUser.notifications.filter(n => !n.read).length : 0;
+            const notificationCount = document.getElementById('notificationCount');
+            
+            if (unreadCount > 0) {
+                notificationCount.textContent = unreadCount > 9 ? '9+' : unreadCount;
+                notificationCount.style.display = 'flex';
+            } else {
+                notificationCount.style.display = 'none';
+            }
+        }
+
+        function toggleNotifications() {
+            document.getElementById('notificationsModal').classList.add('active');
+            
+            const notificationsList = document.getElementById('notificationsList');
+            
+            if (!currentUser.notifications || currentUser.notifications.length === 0) {
+                notificationsList.innerHTML = '<p style="text-align: center; padding: 40px; color: var(--text-secondary);">У вас нет уведомлений</p>';
+                return;
+            }
+            
+            notificationsList.innerHTML = currentUser.notifications.map(notification => {
+                return `
+                    <div class="notification">
+                        <div class="avatar-letter" style="background-color: #7289da">
+                            ${notification.fromUserName ? notification.fromUserName.charAt(0).toUpperCase() : '?'}
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold;">${notification.message}</div>
+                            <div style="font-size: 14px; color: var(--text-secondary);">${formatTime(notification.timestamp)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function closeNotificationsModal() {
+            document.getElementById('notificationsModal').classList.remove('active');
+        }
+
+        function showNotificationsPanel(event) {
+            if (event) event.preventDefault();
+            document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+            event.target.closest('a').classList.add('active');
+            
+            document.getElementById('feedContent').style.display = 'none';
+            document.getElementById('profileContent').style.display = 'none';
+            document.getElementById('friendsContent').style.display = 'none';
+            document.getElementById('messagesContent').style.display = 'none';
+            document.getElementById('notificationsContent').style.display = 'block';
+            document.getElementById('settingsContent').style.display = 'none';
+            document.getElementById('adminContent').style.display = 'none';
+            document.getElementById('verificationContent').style.display = 'none';
+            
+            toggleNotifications();
+        }
+
+        function showSettings(event) {
+            if (event) event.preventDefault();
+            document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+            event.target.closest('a').classList.add('active');
+            
+            document.getElementById('feedContent').style.display = 'none';
+            document.getElementById('profileContent').style.display = 'none';
+            document.getElementById('friendsContent').style.display = 'none';
+            document.getElementById('messagesContent').style.display = 'none';
+            document.getElementById('notificationsContent').style.display = 'none';
+            document.getElementById('settingsContent').style.display = 'block';
+            document.getElementById('adminContent').style.display = 'none';
+            document.getElementById('verificationContent').style.display = 'none';
+            
+            document.getElementById('settingsContent').innerHTML = `
+                <div class="admin-panel">
+                    <h2>Настройки профиля</h2>
+                    
+                    <div class="admin-section">
+                        <h3>Основная информация</h3>
+                        <div class="form-group">
+                            <label>Имя (видно всем)</label>
+                            <input type="text" id="settingsName" class="form-control" value="${currentUser.name}">
+                        </div>
+                        <div class="form-group">
+                            <label>Юзернейм (через @)</label>
+                            <input type="text" id="settingsUsername" class="form-control" value="${currentUser.username}">
+                        </div>
+                        <div class="form-group">
+                            <label>О себе</label>
+                            <textarea id="settingsBio" class="form-control" rows="3">${currentUser.bio || ''}</textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="updateProfileInfo()">Сохранить изменения</button>
+                    </div>
+                    
+                    <div class="admin-section">
+                        <h3>Безопасность</h3>
+                        <div class="form-group">
+                            <label>Текущий пароль</label>
+                            <input type="password" id="currentPassword" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Новый пароль</label>
+                            <input type="password" id="newPassword" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Подтвердите новый пароль</label>
+                            <input type="password" id="confirmPassword" class="form-control">
+                        </div>
+                        <button class="btn btn-primary" onclick="changePassword()">Сменить пароль</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateProfileInfo() {
+            const name = document.getElementById('settingsName').value;
+            const username = document.getElementById('settingsUsername').value;
+            const bio = document.getElementById('settingsBio').value;
+            
+            if (!name || !username) {
+                alert('Имя и юзернейм обязательны');
+                return;
+            }
+            
+            if (!username.startsWith('@')) {
+                alert('Юзернейм должен начинаться с @');
+                return;
+            }
+            
+            currentUser.name = name;
+            currentUser.username = username;
+            currentUser.bio = bio;
+            
+            KNB_DB.updateUser(currentUser);
+            
+            alert('Профиль обновлен');
+            showProfile();
+            updateHeaderAvatar();
+        }
+
+        function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (currentPassword !== currentUser.password) {
+                alert('Текущий пароль неверен');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                alert('Новые пароли не совпадают');
+                return;
+            }
+            
+            currentUser.password = newPassword;
+            KNB_DB.updateUser(currentUser);
+            
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            
+            alert('Пароль успешно изменен');
+        }
+
+        function showMessages(event) {
+            if (event) event.preventDefault();
+            document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+            event.target.closest('a').classList.add('active');
+            
+            document.getElementById('feedContent').style.display = 'none';
+            document.getElementById('profileContent').style.display = 'none';
+            document.getElementById('friendsContent').style.display = 'none';
+            document.getElementById('messagesContent').style.display = 'block';
+            document.getElementById('notificationsContent').style.display = 'none';
+            document.getElementById('settingsContent').style.display = 'none';
+            document.getElementById('adminContent').style.display = 'none';
+            document.getElementById('verificationContent').style.display = 'none';
+            
+            document.getElementById('messagesContent').innerHTML = `
+                <div class="admin-panel">
+                    <h2>Сообщения</h2>
+                    <p style="color: var(--text-secondary); text-align: center; padding: 40px;">
+                        Система сообщений в разработке. Скоро будет доступна!
+                    </p>
+                </div>
+            `;
+        }
+
+        function sendMessageToUser(userId) {
+            showMessages();
+            alert('Система сообщений в разработке');
+        }
+
+        function search() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (!searchTerm.trim()) {
+                alert('Введите поисковый запрос');
+                return;
+            }
+            
+            const users = KNB_DB.getUsers();
+            const posts = KNB_DB.getPosts();
+            
+            const filteredUsers = users.filter(user => 
+                user.name.toLowerCase().includes(searchTerm) || 
+                user.username.toLowerCase().includes(searchTerm) ||
+                (user.bio && user.bio.toLowerCase().includes(searchTerm))
+            );
+            
+            const filteredPosts = posts.filter(post =>
+                post.content.toLowerCase().includes(searchTerm) ||
+                post.name.toLowerCase().includes(searchTerm) ||
+                post.username.toLowerCase().includes(searchTerm)
+            );
+            
+            document.getElementById('feedContent').style.display = 'block';
+            document.getElementById('profileContent').style.display = 'none';
+            document.getElementById('friendsContent').style.display = 'none';
+            document.getElementById('messagesContent').style.display = 'none';
+            document.getElementById('notificationsContent').style.display = 'none';
+            document.getElementById('settingsContent').style.display = 'none';
+            document.getElementById('adminContent').style.display = 'none';
+            document.getElementById('verificationContent').style.display = 'none';
+            
+            const feedContent = document.getElementById('feedContent');
+            feedContent.innerHTML = `
+                <div class="create-post">
+                    <h3>Результаты поиска для: "${searchTerm}"</h3>
+                </div>
+                
+                ${filteredUsers.length > 0 ? `
+                    <div class="post">
+                        <h3 style="margin-bottom: 15px;">Найдено пользователей: ${filteredUsers.length}</h3>
+                        ${filteredUsers.map(user => `
+                            <div class="friend-request" style="margin-bottom: 10px;">
+                                <div class="avatar-letter" style="background-color: ${user.avatarColor}" onclick="showUserProfile(${user.id})">
+                                    ${user.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div style="flex: 1; cursor: pointer;" onclick="showUserProfile(${user.id})">
+                                    <div style="font-weight: bold; display: flex; align-items: center; gap: 5px;">
+                                        ${user.name}
+                                        ${user.verified ? '<i class="fas fa-check-circle verified-badge" style="font-size: 12px;"></i>' : ''}
+                                    </div>
+                                    <div style="font-size: 14px; color: var(--text-secondary);">${user.username}</div>
+                                    <div style="font-size: 14px; margin-top: 5px;">${user.bio || ''}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+                
+                ${filteredPosts.length > 0 ? `
+                    <div style="margin-top: 20px;">
+                        <h3 style="margin-bottom: 15px;">Найдено постов: ${filteredPosts.length}</h3>
+                        ${filteredPosts.map(post => {
+                            const postUser = KNB_DB.getUserById(post.userId);
+                            const isLiked = post.likes && post.likes.includes(currentUser.id);
+                            
+                            return `
+                                <div class="post">
+                                    <div class="post-header">
+                                        <div class="post-avatar" style="background-color: ${post.avatarColor}" onclick="showUserProfile(${post.userId})">
+                                            ${post.name.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div class="post-user-info">
+                                            <div class="post-username">
+                                                ${post.name}
+                                            </div>
+                                            <div class="post-time">${formatTime(post.timestamp)} • ${post.username}</div>
+                                        </div>
+                                    </div>
+                                    <div class="post-content">${post.content}</div>
+                                    ${post.media ? getMediaHTML(post.media, post.mediaType) : ''}
+                                    <div class="post-actions-bar">
+                                        <button class="post-action ${isLiked ? 'liked' : ''}" onclick="likePost(${post.id})">
+                                            <i class="fas fa-heart"></i> <span>${post.likes ? post.likes.length : 0}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                ` : ''}
+                
+                ${filteredUsers.length === 0 && filteredPosts.length === 0 ? `
+                    <div class="post">
+                        <p style="text-align: center; padding: 40px; color: var(--text-secondary);">По вашему запросу ничего не найдено</p>
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        function openFullscreenMedia(mediaData, mediaType, event) {
+            if (event) event.stopPropagation();
+            
+            const fullscreen = document.getElementById('mediaFullscreen');
+            const content = document.getElementById('fullscreenMediaContent');
+            
+            if (mediaType === 'image') {
+                content.innerHTML = `<img src="${mediaData}" alt="Полноэкранное изображение">`;
+            } else if (mediaType === 'video') {
+                content.innerHTML = `<video controls autoplay>
+                    <source src="${mediaData}" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>`;
+            }
+            
+            fullscreen.style.display = 'flex';
+        }
+
+        function closeFullscreenMedia(event) {
+            if (event) event.stopPropagation();
+            document.getElementById('mediaFullscreen').style.display = 'none';
+            const video = document.querySelector('#fullscreenMediaContent video');
+            if (video) {
+                video.pause();
+            }
+        }
+
+        // Горячие клавиши
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'Enter') {
+                if (document.getElementById('quickPostText')) {
+                    quickCreatePost();
+                }
+            }
+            
+            if (event.key === 'Escape') {
+                const modals = document.querySelectorAll('.modal.active');
+                if (modals.length > 0) {
+                    modals.forEach(modal => modal.classList.remove('active'));
+                }
+                closeFullscreenMedia();
+            }
+        });
+        // Система редактирования профиля
+let selectedBannerColor = null;
+let avatarFile = null;
+let bannerFile = null;
+let avatarPreviewUrl = null;
+let bannerPreviewUrl = null;
+
+function showEditProfileModal() {
+    document.getElementById('editProfileModal').classList.add('active');
+    
+    // Заполняем текущие данные
+    document.getElementById('editProfileName').value = currentUser.name;
+    document.getElementById('editProfileUsername').value = currentUser.username;
+    document.getElementById('editProfileBio').value = currentUser.bio || '';
+    selectedBannerColor = currentUser.bannerColor || '#7289da';
+    
+    // Показываем текущий аватар и баннер
+    const avatarPreview = document.getElementById('avatarPreview');
+    const bannerPreview = document.getElementById('bannerPreview');
+    
+    if (currentUser.avatarImage) {
+        avatarPreview.innerHTML = `<img src="${currentUser.avatarImage}" alt="Аватар">`;
+    } else {
+        avatarPreview.innerHTML = `
+            <div style="width: 100%; height: 100%; border-radius: 50%; background-color: ${currentUser.avatarColor}; 
+                 display: flex; align-items: center; justify-content: center; font-size: 60px; color: white;">
+                ${currentUser.name.charAt(0).toUpperCase()}
+            </div>
+        `;
+    }
+    
+    if (currentUser.bannerImage) {
+        bannerPreview.innerHTML = `<img src="${currentUser.bannerImage}" alt="Баннер">`;
+    } else {
+        bannerPreview.style.background = currentUser.bannerColor || '#7289da';
+        bannerPreview.style.height = '200px';
+        bannerPreview.style.borderRadius = '10px';
+    }
+}
+
+function closeEditProfileModal() {
+    document.getElementById('editProfileModal').classList.remove('active');
+    
+    // Очищаем временные файлы
+    if (avatarPreviewUrl) URL.revokeObjectURL(avatarPreviewUrl);
+    if (bannerPreviewUrl) URL.revokeObjectURL(bannerPreviewUrl);
+    avatarFile = null;
+    bannerFile = null;
+    avatarPreviewUrl = null;
+    bannerPreviewUrl = null;
+}
+
+function previewAvatar(event) {
+    const file = event.target.files[0];
+    if (!file || !file.type.startsWith('image/')) return;
+    
+    avatarFile = file;
+    
+    if (avatarPreviewUrl) {
+        URL.revokeObjectURL(avatarPreviewUrl);
+    }
+    
+    avatarPreviewUrl = URL.createObjectURL(file);
+    document.getElementById('avatarPreview').innerHTML = `
+        <img src="${avatarPreviewUrl}" alt="Предпросмотр аватара">
+    `;
+}
+
+function previewBanner(event) {
+    const file = event.target.files[0];
+    if (!file || !file.type.startsWith('image/')) return;
+    
+    bannerFile = file;
+    
+    if (bannerPreviewUrl) {
+        URL.revokeObjectURL(bannerPreviewUrl);
+    }
+    
+    bannerPreviewUrl = URL.createObjectURL(file);
+    document.getElementById('bannerPreview').innerHTML = `
+        <img src="${bannerPreviewUrl}" alt="Предпросмотр баннера">
+    `;
+}
+
+function selectBannerColor(color) {
+    selectedBannerColor = color;
+    document.getElementById('customBannerColor').value = color;
+    
+    if (!bannerFile) {
+        const bannerPreview = document.getElementById('bannerPreview');
+        bannerPreview.innerHTML = '';
+        bannerPreview.style.background = color;
+        bannerPreview.style.height = '200px';
+        bannerPreview.style.borderRadius = '10px';
+    }
+}
+
+function selectCustomBannerColor(color) {
+    selectedBannerColor = color;
+    
+    if (!bannerFile) {
+        const bannerPreview = document.getElementById('bannerPreview');
+        bannerPreview.innerHTML = '';
+        bannerPreview.style.background = color;
+        bannerPreview.style.height = '200px';
+        bannerPreview.style.borderRadius = '10px';
+    }
+}
+
+function saveProfileChanges() {
+    const name = document.getElementById('editProfileName').value;
+    const username = document.getElementById('editProfileUsername').value;
+    const bio = document.getElementById('editProfileBio').value;
+    
+    if (!name || !username) {
+        alert('Заполните имя и юзернейм');
+        return;
+    }
+    
+    if (!username.startsWith('@')) {
+        alert('Юзернейм должен начинаться с @');
+        return;
+    }
+    
+    // Обновляем данные пользователя
+    currentUser.name = name;
+    currentUser.username = username;
+    currentUser.bio = bio;
+    currentUser.bannerColor = selectedBannerColor;
+    
+    // Обрабатываем аватар
+    if (avatarFile) {
+        const reader = new FileReader();
+        reader.onloadend = function() {
+            currentUser.avatarImage = reader.result;
+            completeProfileUpdate();
+        };
+        reader.readAsDataURL(avatarFile);
+    } else {
+        completeProfileUpdate();
+    }
+    
+    // Обрабатываем баннер
+    if (bannerFile) {
+        const reader = new FileReader();
+        reader.onloadend = function() {
+            currentUser.bannerImage = reader.result;
+            if (!avatarFile) {
+                completeProfileUpdate();
+            }
+        };
+        reader.readAsDataURL(bannerFile);
+    }
+}
+
+function completeProfileUpdate() {
+    KNB_DB.updateUser(currentUser);
+    closeEditProfileModal();
+    showProfile();
+    updateHeaderAvatar();
+    alert('Профиль успешно обновлен!');
+}
+
+// Система личных сообщений
+let currentConversationId = null;
+let conversationUsers = {}; // Кэш пользователей для диалогов
+
+function showMessages(event) {
+    if (event) event.preventDefault();
+    document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+    event.target.closest('a').classList.add('active');
+    
+    document.getElementById('feedContent').style.display = 'none';
+    document.getElementById('profileContent').style.display = 'none';
+    document.getElementById('friendsContent').style.display = 'none';
+    document.getElementById('messagesContent').style.display = 'block';
+    document.getElementById('notificationsContent').style.display = 'none';
+    document.getElementById('settingsContent').style.display = 'none';
+    document.getElementById('adminContent').style.display = 'none';
+    document.getElementById('verificationContent').style.display = 'none';
+    
+    loadMessagesPage();
+}
+
+function loadMessagesPage() {
+    const messagesContent = document.getElementById('messagesContent');
+    
+    messagesContent.innerHTML = `
+        <div class="messages-container">
+            <div class="conversations-list">
+                <div style="padding: 20px; border-bottom: 1px solid var(--border-color);">
+                    <h3>Сообщения</h3>
+                    <button class="btn btn-primary" onclick="startNewConversation()" style="width: 100%; margin-top: 10px;">
+                        <i class="fas fa-plus"></i> Новое сообщение
+                    </button>
+                </div>
+                <div id="conversationsList"></div>
+            </div>
+            <div class="messages-area">
+                <div id="noConversation" class="no-conversation-selected">
+                    <div>
+                        <i class="fas fa-comments" style="font-size: 60px; margin-bottom: 20px; color: var(--text-secondary);"></i>
+                        <h3>Выберите диалог</h3>
+                        <p>или начните новое общение</p>
+                    </div>
+                </div>
+                <div id="activeConversation" style="display: none;">
+                    <div class="messages-header" id="conversationHeader"></div>
+                    <div class="messages-list" id="messagesList"></div>
+                    <div class="message-input-container">
+                        <input type="text" class="message-input" id="messageInput" placeholder="Введите сообщение..." onkeypress="if(event.key=='Enter') sendMessage()">
+                        <button class="btn btn-primary" onclick="sendMessage()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    loadConversations();
+}
+
+function loadConversations() {
+    const messages = KNB_DB.getMessages();
+    const users = KNB_DB.getUsers();
+    
+    // Получаем все уникальные диалоги
+    const conversations = {};
+    
+    messages.forEach(message => {
+        if (message.senderId === currentUser.id || message.receiverId === currentUser.id) {
+            const otherUserId = message.senderId === currentUser.id ? message.receiverId : message.senderId;
+            if (!conversations[otherUserId]) {
+                conversations[otherUserId] = {
+                    userId: otherUserId,
+                    lastMessage: message,
+                    unread: message.receiverId === currentUser.id && !message.read,
+                    count: 1
+                };
+            } else {
+                if (new Date(message.timestamp) > new Date(conversations[otherUserId].lastMessage.timestamp)) {
+                    conversations[otherUserId].lastMessage = message;
+                }
+                if (message.receiverId === currentUser.id && !message.read) {
+                    conversations[otherUserId].unread = true;
+                }
+                conversations[otherUserId].count++;
+            }
+        }
+    });
+    
+    const conversationsList = document.getElementById('conversationsList');
+    const conversationArray = Object.values(conversations);
+    
+    if (conversationArray.length === 0) {
+        conversationsList.innerHTML = `
+            <div style="padding: 40px 20px; text-align: center; color: var(--text-secondary);">
+                <i class="fas fa-comment-slash" style="font-size: 40px; margin-bottom: 15px;"></i>
+                <p>У вас пока нет сообщений</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Сортируем по времени последнего сообщения
+    conversationArray.sort((a, b) => 
+        new Date(b.lastMessage.timestamp) - new Date(a.lastMessage.timestamp)
+    );
+    
+    conversationsList.innerHTML = conversationArray.map(conv => {
+        const user = users.find(u => u.id === conv.userId);
+        if (!user) return '';
+        
+        conversationUsers[conv.userId] = user;
+        
+        const lastMessage = conv.lastMessage.content.length > 30 ? 
+            conv.lastMessage.content.substring(0, 30) + '...' : conv.lastMessage.content;
+        
+        return `
+            <div class="conversation-item ${currentConversationId === conv.userId ? 'active' : ''}" 
+                 onclick="openConversation(${conv.userId})">
+                <div class="conversation-avatar" style="background-color: ${user.avatarColor}">
+                    ${user.avatarImage ? 
+                        `<img src="${user.avatarImage}" alt="${user.name}" style="width: 100%; height: 100%; border-radius: 50%;">` : 
+                        user.name.charAt(0).toUpperCase()}
+                </div>
+                <div class="conversation-info">
+                    <div class="conversation-name">
+                        ${user.name}
+                        ${user.verified ? '<i class="fas fa-check-circle verified-badge" style="font-size: 12px;"></i>' : ''}
+                        ${conv.unread ? '<span style="background: var(--primary-color); color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px;">новое</span>' : ''}
+                    </div>
+                    <div class="conversation-last-message">
+                        ${conv.lastMessage.senderId === currentUser.id ? 'Вы: ' : ''}${lastMessage}
+                    </div>
+                </div>
+                <div class="conversation-time">
+                    ${formatTime(conv.lastMessage.timestamp)}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function openConversation(userId) {
+    currentConversationId = userId;
+    const user = conversationUsers[userId];
+    
+    if (!user) return;
+    
+    document.getElementById('noConversation').style.display = 'none';
+    document.getElementById('activeConversation').style.display = 'flex';
+    document.getElementById('activeConversation').style.flexDirection = 'column';
+    
+    // Заголовок диалога
+    document.getElementById('conversationHeader').innerHTML = `
+        <div class="conversation-avatar" style="width: 40px; height: 40px; background-color: ${user.avatarColor}">
+            ${user.avatarImage ? 
+                `<img src="${user.avatarImage}" alt="${user.name}" style="width: 100%; height: 100%; border-radius: 50%;">` : 
+                user.name.charAt(0).toUpperCase()}
+        </div>
+        <div>
+            <div style="font-weight: bold; display: flex; align-items: center; gap: 5px;">
+                ${user.name}
+                ${user.verified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}
+            </div>
+            <div style="font-size: 14px; color: var(--text-secondary);">
+                ${user.online ? '<span style="color: var(--success);">● онлайн</span>' : 'был(а) недавно'}
+            </div>
+        </div>
+    `;
+    
+    loadMessages(userId);
+    markMessagesAsRead(userId);
+    loadConversations(); // Обновляем список, чтобы убрать метку "новое"
+}
+
+function loadMessages(userId) {
+    const messages = KNB_DB.getMessages();
+    const messagesList = document.getElementById('messagesList');
+    
+    const conversationMessages = messages.filter(msg => 
+        (msg.senderId === currentUser.id && msg.receiverId === userId) ||
+        (msg.senderId === userId && msg.receiverId === currentUser.id)
+    ).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    
+    if (conversationMessages.length === 0) {
+        messagesList.innerHTML = `
+            <div style="text-align: center; color: var(--text-secondary); margin-top: 40px;">
+                <i class="fas fa-comment" style="font-size: 40px; margin-bottom: 15px;"></i>
+                <p>Начните общение с этим пользователем</p>
+            </div>
+        `;
+        return;
+    }
+    
+    messagesList.innerHTML = conversationMessages.map(msg => {
+        const isSent = msg.senderId === currentUser.id;
+        return `
+            <div class="message ${isSent ? 'sent' : 'received'}">
+                <div class="message-content">
+                    ${msg.content}
+                    ${msg.attachment ? `<div style="margin-top: 10px;"><i class="fas fa-paperclip"></i> Вложение</div>` : ''}
+                </div>
+                <div class="message-time">
+                    ${formatTime(msg.timestamp)}
+                    ${isSent && msg.read ? ' <i class="fas fa-check-double" style="color: var(--verified-color);"></i>' : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Прокручиваем вниз
+    messagesList.scrollTop = messagesList.scrollHeight;
+}
+
+function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const message = input.value.trim();
+    
+    if (!message || !currentConversationId) return;
+    
+    const newMessage = {
+        senderId: currentUser.id,
+        receiverId: currentConversationId,
+        content: message,
+        timestamp: new Date().toISOString(),
+        read: false
+    };
+    
+    KNB_DB.addMessage(newMessage);
+    input.value = '';
+    loadMessages(currentConversationId);
+    loadConversations();
+    
+    // Отправляем уведомление (в реальном приложении здесь был бы WebSocket)
+    const receiver = KNB_DB.getUserById(currentConversationId);
+    if (receiver && receiver.notifications) {
+        receiver.notifications.push({
+            type: 'message',
+            fromUserId: currentUser.id,
+            fromUserName: currentUser.name,
+            message: `Новое сообщение от ${currentUser.name}`,
+            timestamp: new Date().toISOString(),
+            read: false
+        });
+        KNB_DB.updateUser(receiver);
+    }
+}
+
+function markMessagesAsRead(userId) {
+    const messages = KNB_DB.getMessages();
+    let updated = false;
+    
+    messages.forEach(msg => {
+        if (msg.receiverId === currentUser.id && msg.senderId === userId && !msg.read) {
+            msg.read = true;
+            updated = true;
+        }
+    });
+    
+    if (updated) {
+        localStorage.setItem('knb_messages', JSON.stringify(messages));
+    }
+}
+
+function startNewConversation() {
+    const users = KNB_DB.getUsers().filter(user => user.id !== currentUser.id);
+    
+    const userList = users.map(user => `
+        <div class="friend-request" onclick="selectUserForMessage(${user.id})" style="cursor: pointer;">
+            <div class="avatar-letter" style="background-color: ${user.avatarColor}">
+                ${user.avatarImage ? 
+                    `<img src="${user.avatarImage}" alt="${user.name}" style="width: 100%; height: 100%; border-radius: 50%;">` : 
+                    user.name.charAt(0).toUpperCase()}
+            </div>
+            <div style="flex: 1;">
+                <div style="font-weight: bold; display: flex; align-items: center; gap: 5px;">
+                    ${user.name}
+                    ${user.verified ? '<i class="fas fa-check-circle verified-badge" style="font-size: 12px;"></i>' : ''}
+                </div>
+                <div style="font-size: 14px; color: var(--text-secondary);">${user.username}</div>
+            </div>
+        </div>
+    `).join('');
+    
+    document.getElementById('messagesContent').innerHTML = `
+        <div class="admin-panel">
+            <h2>Новое сообщение</h2>
+            <div style="margin-bottom: 20px;">
+                <input type="text" class="form-control" id="searchUserInput" placeholder="Поиск пользователей..." 
+                       onkeyup="searchUsersForMessage()">
+            </div>
+            <div id="newMessageUserList">
+                ${userList}
+            </div>
+            <button class="btn btn-primary" onclick="loadMessagesPage()" style="margin-top: 20px;">
+                <i class="fas fa-arrow-left"></i> Назад к сообщениям
+            </button>
+        </div>
+    `;
+}
+
+function selectUserForMessage(userId) {
+    currentConversationId = userId;
+    conversationUsers[userId] = KNB_DB.getUserById(userId);
+    loadMessagesPage();
+    setTimeout(() => openConversation(userId), 100);
+}
+
+function searchUsersForMessage() {
+    const searchTerm = document.getElementById('searchUserInput').value.toLowerCase();
+    const users = KNB_DB.getUsers().filter(user => 
+        user.id !== currentUser.id && 
+        (user.name.toLowerCase().includes(searchTerm) || 
+         user.username.toLowerCase().includes(searchTerm))
+    );
+    
+    document.getElementById('newMessageUserList').innerHTML = users.map(user => `
+        <div class="friend-request" onclick="selectUserForMessage(${user.id})" style="cursor: pointer;">
+            <div class="avatar-letter" style="background-color: ${user.avatarColor}">
+                ${user.avatarImage ? 
+                    `<img src="${user.avatarImage}" alt="${user.name}" style="width: 100%; height: 100%; border-radius: 50%;">` : 
+                    user.name.charAt(0).toUpperCase()}
+            </div>
+            <div style="flex: 1;">
+                <div style="font-weight: bold; display: flex; align-items: center; gap: 5px;">
+                    ${user.name}
+                    ${user.verified ? '<i class="fas fa-check-circle verified-badge" style="font-size: 12px;"></i>' : ''}
+                </div>
+                <div style="font-size: 14px; color: var(--text-secondary);">${user.username}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function sendMessageToUser(userId) {
+    showMessages();
+    setTimeout(() => {
+        selectUserForMessage(userId);
+    }, 100);
+}
+
+// Расширенная система верификации
+let selectedVerificationType = 'blue';
+let verificationDocumentFile = null;
+let verificationDocumentUrl = null;
+
+function showVerificationModal() {
+    if (currentUser.verified) {
+        alert('Ваш аккаунт уже верифицирован!');
+        return;
+    }
+    
+    const existingRequest = KNB_DB.getVerificationRequests().find(
+        req => req.userId === currentUser.id && req.status === 'pending'
+    );
+    
+    if (existingRequest) {
+        document.getElementById('verificationModal').classList.add('active');
+        document.getElementById('verificationForm').style.display = 'none';
+        
+        const statusDiv = document.getElementById('verificationStatus');
+        statusDiv.style.display = 'block';
+        statusDiv.innerHTML = `
+            <h3>Заявка на рассмотрении</h3>
+            <p>Ваша заявка на верификацию находится на рассмотрении.</p>
+            <p><strong>Дата подачи:</strong> ${formatTime(existingRequest.submitted)}</p>
+            <p><strong>Тип:</strong> ${existingRequest.type || 'стандартная'}</p>
+            <div style="background-color: rgba(250, 166, 26, 0.1); padding: 15px; border-radius: 8px; margin-top: 15px;">
+                <i class="fas fa-clock" style="color: var(--warning); margin-right: 10px;"></i>
+                Обычно рассмотрение занимает 3-7 рабочих дней
+            </div>
+            <button class="btn btn-danger" onclick="cancelVerificationRequest()" style="margin-top: 20px;">
+                Отозвать заявку
+            </button>
+        `;
+        return;
+    }
+    
+    document.getElementById('verificationTypeModal').classList.add('active');
+}
+
+function closeVerificationTypeModal() {
+    document.getElementById('verificationTypeModal').classList.remove('active');
+}
+
+function selectVerificationType(type) {
+    selectedVerificationType = type;
+    
+    document.querySelectorAll('.verification-type').forEach(el => {
+        el.classList.remove('selected');
+    });
+    
+    document.querySelector(`.verification-type.${type}`).classList.add('selected');
+}
+
+function proceedToVerificationForm() {
+    closeVerificationTypeModal();
+    document.getElementById('verificationModal').classList.add('active');
+    
+    const form = document.getElementById('verificationForm');
+    form.style.display = 'block';
+    form.innerHTML = `
+        <h3>Верификация: ${getVerificationTypeName(selectedVerificationType)}</h3>
+        ${selectedVerificationType !== 'blue' ? `
+            <div style="background-color: rgba(255, 215, 0, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <i class="fas fa-gem" style="color: gold; margin-right: 10px;"></i>
+                <strong>${selectedVerificationType === 'gold' ? 'Золотая' : 'Серебряная'} верификация:</strong>
+                Платный статус с дополнительными возможностями
+            </div>
+        ` : ''}
+        
+        <div class="form-group">
+            <label>Ваше настоящее имя</label>
+            <input type="text" id="verificationRealName" class="form-control" placeholder="Как в документах" value="${currentUser.name}">
+        </div>
+        
+        <div class="form-group">
+            <label>Номер телефона</label>
+            <input type="tel" id="verificationPhone" class="form-control" placeholder="+7 (XXX) XXX-XX-XX">
+        </div>
+        
+        <div class="form-group">
+            <label>Загрузите документ, удостоверяющий личность</label>
+            <div class="verification-document-upload" onclick="document.getElementById('verificationDocumentFile').click()">
+                <i class="fas fa-upload" style="font-size: 40px; margin-bottom: 15px; color: var(--text-secondary);"></i>
+                <p>Нажмите для загрузки документа</p>
+                <p style="font-size: 12px; color: var(--text-secondary);">Поддерживаемые форматы: JPG, PNG, PDF (макс. 5MB)</p>
+            </div>
+            <input type="file" id="verificationDocumentFile" class="file-input" 
+                   accept="image/*,.pdf" onchange="previewVerificationDocument(event)">
+            <div id="verificationDocumentPreview" class="verification-preview" style="display: none;"></div>
+        </div>
+        
+        <div class="form-group">
+            <label>Дополнительная информация</label>
+            <textarea id="verificationReason" class="form-control" rows="3" 
+                      placeholder="Расскажите о себе, своих достижениях, причинах запроса верификации"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label>Ссылки для подтверждения (по одной на строку)</label>
+            <textarea id="verificationLinks" class="form-control" rows="2" 
+                      placeholder="https://example.com/profile"></textarea>
+        </div>
+        
+        ${selectedVerificationType !== 'blue' ? `
+            <div class="form-group">
+                <label>Способ оплаты</label>
+                <select id="paymentMethod" class="form-control">
+                    <option value="card">Банковская карта</option>
+                    <option value="qiwi">QIWI</option>
+                    <option value="yoomoney">ЮMoney</option>
+                </select>
+            </div>
+        ` : ''}
+        
+        <button class="btn btn-success btn-block" onclick="submitVerificationRequest()">
+            ${selectedVerificationType === 'blue' ? 'Отправить заявку' : 'Перейти к оплате'}
+        </button>
+    `;
+}
+
+function getVerificationTypeName(type) {
+    const names = {
+        'blue': 'Синяя верификация',
+        'silver': 'Серебряная верификация',
+        'gold': 'Золотая верификация'
+    };
+    return names[type] || 'Верификация';
+}
+
+function previewVerificationDocument(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    if (file.size > 5 * 1024 * 1024) {
+        alert('Файл слишком большой. Максимальный размер: 5MB');
+        event.target.value = '';
+        return;
+    }
+    
+    verificationDocumentFile = file;
+    
+    if (verificationDocumentUrl) {
+        URL.revokeObjectURL(verificationDocumentUrl);
+    }
+    
+    verificationDocumentUrl = URL.createObjectURL(file);
+    const preview = document.getElementById('verificationDocumentPreview');
+    preview.style.display = 'block';
+    
+    if (file.type.startsWith('image/')) {
+        preview.innerHTML = `<img src="${verificationDocumentUrl}" alt="Предпросмотр документа">`;
+    } else if (file.type === 'application/pdf') {
+        preview.innerHTML = `
+            <div style="padding: 20px; background-color: var(--darker-bg); border-radius: 8px; text-align: center;">
+                <i class="fas fa-file-pdf" style="font-size: 40px; color: #e74c3c; margin-bottom: 10px;"></i>
+                <div>${file.name}</div>
+                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">
+                    PDF документ
+                </div>
+            </div>
+        `;
+    }
+}
+
+function submitVerificationRequest() {
+    const realName = document.getElementById('verificationRealName').value;
+    const phone = document.getElementById('verificationPhone').value;
+    const reason = document.getElementById('verificationReason').value;
+    const links = document.getElementById('verificationLinks').value;
+    
+    if (!realName || !phone || !verificationDocumentFile) {
+        alert('Заполните обязательные поля и загрузите документ');
+        return;
+    }
+    
+    // В реальном приложении здесь была бы оплата
+    if (selectedVerificationType !== 'blue') {
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        alert(`В реальном приложении здесь был бы переход к оплате ${getVerificationTypeName(selectedVerificationType)} через ${paymentMethod}`);
+        // Для демо просто создаем заявку
+    }
+    
+    const reader = new FileReader();
+    reader.onloadend = function() {
+        const verificationRequest = {
+            userId: currentUser.id,
+            type: selectedVerificationType,
+            realName: realName,
+            phone: phone,
+            document: reader.result,
+            documentType: verificationDocumentFile.type,
+            reason: reason,
+            links: links,
+            status: 'pending',
+            submitted: new Date().toISOString()
+        };
+        
+        KNB_DB.addVerificationRequest(verificationRequest);
+        
+        // Создаем уведомление для админов
+        const users = KNB_DB.getUsers();
+        users.forEach(user => {
+            if (user.isAdmin) {
+                if (!user.notifications) user.notifications = [];
+                user.notifications.push({
+                    type: 'verification',
+                    fromUserId: currentUser.id,
+                    fromUserName: currentUser.name,
+                    message: `Новая заявка на ${getVerificationTypeName(selectedVerificationType)}`,
+                    timestamp: new Date().toISOString(),
+                    read: false
+                });
+                KNB_DB.updateUser(user);
+            }
+        });
+        
+        alert('Заявка на верификацию отправлена! Мы рассмотрим ее в ближайшее время.');
+        closeVerificationModal();
+        showVerificationPanel();
+        
+        if (verificationDocumentUrl) {
+            URL.revokeObjectURL(verificationDocumentUrl);
+            verificationDocumentUrl = null;
+        }
+    };
+    
+    reader.readAsDataURL(verificationDocumentFile);
+}
+
+function cancelVerificationRequest() {
+    if (!confirm('Вы уверены, что хотите отозвать заявку на верификацию?')) return;
+    
+    const requests = KNB_DB.getVerificationRequests();
+    const index = requests.findIndex(req => 
+        req.userId === currentUser.id && req.status === 'pending'
+    );
+    
+    if (index !== -1) {
+        requests.splice(index, 1);
+        localStorage.setItem('knb_verification_requests', JSON.stringify(requests));
+        alert('Заявка отозвана');
+        closeVerificationModal();
+        showVerificationPanel();
+    }
+}
+
+// Обновляем функцию approveVerification для отправки уведомлений
+function approveVerification(userId, level) {
+    const user = KNB_DB.getUserById(userId);
+    if (!user) return;
+    
+    user.verified = true;
+    user.verificationLevel = level;
+    user.verificationDate = new Date().toISOString();
+    
+    // Добавляем уведомление пользователю
+    if (!user.notifications) user.notifications = [];
+    user.notifications.push({
+        type: 'verification_approved',
+        message: `Поздравляем! Ваш аккаунт получил ${level === 'gold' ? 'золотую' : level === 'silver' ? 'серебряную' : 'синюю'} верификацию`,
+        timestamp: new Date().toISOString(),
+        read: false
+    });
+    
+    KNB_DB.updateUser(user);
+    
+    const requests = KNB_DB.getVerificationRequests();
+    const request = requests.find(r => r.userId === userId && r.status === 'pending');
+    if (request) {
+        request.status = 'approved';
+        request.approvedBy = currentUser.id;
+        request.approvedAt = new Date().toISOString();
+        localStorage.setItem('knb_verification_requests', JSON.stringify(requests));
+    }
+    
+    alert(`Пользователь ${user.name} верифицирован`);
+    showAdminPanel();
+}
+
+// Обновляем функцию rejectVerification для отправки уведомлений
+function rejectVerification(userId) {
+    const user = KNB_DB.getUserById(userId);
+    if (!user) return;
+    
+    // Добавляем уведомление пользователю
+    if (!user.notifications) user.notifications = [];
+    user.notifications.push({
+        type: 'verification_rejected',
+        message: 'Ваша заявка на верификацию отклонена. Вы можете подать новую заявку через 30 дней.',
+        timestamp: new Date().toISOString(),
+        read: false
+    });
+    
+    KNB_DB.updateUser(user);
+    
+    const requests = KNB_DB.getVerificationRequests();
+    const request = requests.find(r => r.userId === userId && r.status === 'pending');
+    if (request) {
+        request.status = 'rejected';
+        request.rejectedBy = currentUser.id;
+        request.rejectedAt = new Date().toISOString();
+        localStorage.setItem('knb_verification_requests', JSON.stringify(requests));
+    }
+    
+    alert(`Заявка на верификацию от ${user.name} отклонена`);
+    showAdminPanel();
+}
+
+// Обновляем функцию showSettings для добавления кнопки редактирования профиля
+function showSettings(event) {
+    if (event) event.preventDefault();
+    document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+    event.target.closest('a').classList.add('active');
+    
+    document.getElementById('feedContent').style.display = 'none';
+    document.getElementById('profileContent').style.display = 'none';
+    document.getElementById('friendsContent').style.display = 'none';
+    document.getElementById('messagesContent').style.display = 'none';
+    document.getElementById('notificationsContent').style.display = 'none';
+    document.getElementById('settingsContent').style.display = 'block';
+    document.getElementById('adminContent').style.display = 'none';
+    document.getElementById('verificationContent').style.display = 'none';
+    
+    document.getElementById('settingsContent').innerHTML = `
+        <div class="admin-panel">
+            <h2>Настройки профиля</h2>
+            
+            <div style="margin-bottom: 30px;">
+                <button class="btn btn-primary" onclick="showEditProfileModal()">
+                    <i class="fas fa-edit"></i> Редактировать профиль
+                </button>
+                <button class="btn" style="background: var(--darker-bg); margin-left: 10px;" onclick="showProfile()">
+                    <i class="fas fa-eye"></i> Посмотреть профиль
+                </button>
+            </div>
+            
+            <div class="admin-section">
+                <h3>Основная информация</h3>
+                <div class="form-group">
+                    <label>Имя (видно всем)</label>
+                    <input type="text" id="settingsName" class="form-control" value="${currentUser.name}">
+                </div>
+                <div class="form-group">
+                    <label>Юзернейм (через @)</label>
+                    <input type="text" id="settingsUsername" class="form-control" value="${currentUser.username}">
+                </div>
+                <div class="form-group">
+                    <label>О себе</label>
+                    <textarea id="settingsBio" class="form-control" rows="3">${currentUser.bio || ''}</textarea>
+                </div>
+                <button class="btn btn-primary" onclick="updateProfileInfo()">Сохранить изменения</button>
+            </div>
+            
+            <div class="admin-section">
+                <h3>Безопасность</h3>
+                <div class="form-group">
+                    <label>Текущий пароль</label>
+                    <input type="password" id="currentPassword" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Новый пароль</label>
+                    <input type="password" id="newPassword" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Подтвердите новый пароль</label>
+                    <input type="password" id="confirmPassword" class="form-control">
+                </div>
+                <button class="btn btn-primary" onclick="changePassword()">Сменить пароль</button>
+            </div>
+            
+            <div class="admin-section">
+                <h3>Конфиденциальность</h3>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="privacyPrivate" ${currentUser.privateProfile ? 'checked' : ''}>
+                        Закрытый профиль
+                    </label>
+                    <div style="font-size: 14px; color: var(--text-secondary); margin-top: 5px;">
+                        Только друзья смогут видеть ваши посты и информацию
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="savePrivacySettings()">Сохранить настройки</button>
+            </div>
+        </div>
+    `;
+}
+
+function savePrivacySettings() {
+    const privateProfile = document.getElementById('privacyPrivate').checked;
+    currentUser.privateProfile = privateProfile;
+    KNB_DB.updateUser(currentUser);
+    alert('Настройки конфиденциальности сохранены');
+}
+
+// Обновляем функцию showProfile для отображения нового аватара/баннера
+function showProfile(userId = null) {
+    const targetUserId = userId || currentUser.id;
+    
+    document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+    if (event && event.target.closest('a')) {
+        event.target.closest('a').classList.add('active');
+    }
+    
+    document.getElementById('feedContent').style.display = 'none';
+    document.getElementById('profileContent').style.display = 'block';
+    // ... остальной код функции showProfile ...
+    
+    // Обновляем отображение аватара в профиле:
+    const profileAvatar = user.avatarImage ? 
+        `<img src="${user.avatarImage}" alt="${user.name}" style="width: 100%; height: 100%; border-radius: 50%;">` :
+        `<div style="width: 100%; height: 100%; border-radius: 50%; background-color: ${user.avatarColor}; 
+             display: flex; align-items: center; justify-content: center; font-size: 60px; color: white;">
+            ${user.name.charAt(0).toUpperCase()}
+        </div>`;
+    
+    // Обновляем отображение баннера:
+    const profileBanner = user.bannerImage ? 
+        `style="background: url('${user.bannerImage}') center/cover;"` :
+        `style="background: ${user.bannerColor};"`;
+}
+
+        // Автоматическая загрузка онлайн пользователей
+        setInterval(loadOnlineUsers, 30000);
+    </script>
+</body>
+</html>
