@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>KNB — Социальная сеть</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<!-- MAINTENANCE SCREEN -->
+<div id="maintenance-screen" style="display:none;">
+    <div class="maintenance-content">
+        <div class="maintenance-icon"><i class="fas fa-tools"></i></div>
+        <h1>Технические работы</h1>
+        <p id="maintenance-msg">Сайт временно недоступен. Скоро вернёмся!</p>
+        <div class="maintenance-spinner"></div>
+    </div>
+</div>
+
+<div id="app">
+    <header>
+        <button class="mobile-menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+        <div class="logo">KNB<span>.</span></div>
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search-input" placeholder="Поиск...">
+            <div id="search-results" class="search-results"></div>
+        </div>
+        <div class="user-actions" id="user-actions"></div>
+        <button class="mobile-menu-toggle" id="rightPanelToggle"><i class="fas fa-ellipsis-h"></i></button>
+    </header>
+
+    <div class="main-layout">
+        <div class="left-panel" id="leftPanel">
+            <ul class="nav-menu" id="nav-menu">
+                <li class="nav-item active" data-page="feed"><i class="fas fa-home"></i><span>Главная</span></li>
+                <li class="nav-item" data-page="stories"><i class="fas fa-film"></i><span>Сторис</span></li>
+                <li class="nav-item" data-page="profile"><i class="fas fa-user"></i><span>Профиль</span></li>
+                <li class="nav-item" data-page="communities"><i class="fas fa-users"></i><span>Сообщества</span></li>
+                <li class="nav-item" data-page="friends"><i class="fas fa-user-friends"></i><span>Друзья</span></li>
+                <li class="nav-item" data-page="messages"><i class="fas fa-envelope"></i><span>Сообщения</span></li>
+                <li class="nav-item" data-page="notifications"><i class="fas fa-bell"></i><span>Уведомления</span><span class="notif-badge" id="notif-badge" style="display:none"></span></li>
+                <li class="nav-item" data-page="support"><i class="fas fa-life-ring"></i><span>Поддержка</span></li>
+                <li class="nav-item" data-page="settings"><i class="fas fa-cog"></i><span>Настройки</span></li>
+                <li class="nav-item" id="admin-panel-btn" data-page="admin" style="display:none;"><i class="fas fa-shield-alt"></i><span>Админ панель</span></li>
+            </ul>
+            <div class="friends-online">
+                <p><i class="fas fa-circle online-dot"></i> Друзья онлайн</p>
+                <div id="friends-online">—</div>
+            </div>
+        </div>
+
+        <div class="center-panel" id="center-panel"></div>
+
+        <div class="right-panel" id="rightPanel">
+            <div class="panel-title">🎯 Рекомендации</div>
+            <div id="suggested-users"></div>
+            <div class="panel-title">📢 Уведомления</div>
+            <div id="recent-notifications"></div>
+            <div class="panel-title">🏆 Достижения</div>
+            <div id="achievements"></div>
+        </div>
+    </div>
+
+    <!-- ===== AUTH MODAL ===== -->
+    <div class="modal" id="auth-modal">
+        <div class="modal-content auth-modal-content">
+            <div class="auth-brand">
+                <div class="auth-logo">KNB<span>.</span></div>
+                <p class="auth-tagline">Твоя социальная сеть</p>
+            </div>
+            <div id="login-form">
+                <h2 class="auth-title">Добро пожаловать</h2>
+                <p class="auth-sub">Войдите в свой аккаунт</p>
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Email или @username</label>
+                    <input type="text" id="login-identifier" placeholder="email@example.com" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Пароль</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="login-password" placeholder="Ваш пароль" autocomplete="current-password">
+                        <button type="button" class="toggle-pass" onclick="togglePassword('login-password',this)"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                <button class="auth-btn" id="login-btn"><i class="fas fa-sign-in-alt"></i> Войти</button>
+                <p class="auth-switch">Нет аккаунта? <a href="#" id="show-register">Зарегистрироваться</a></p>
+            </div>
+            <div id="register-form" style="display:none;">
+                <h2 class="auth-title">Создать аккаунт</h2>
+                <p class="auth-sub">Шаг 1 из 2 — Email</p>
+                <div class="auth-steps"><div class="step active">1</div><div class="step-line"></div><div class="step">2</div></div>
+                <div class="form-group"><label><i class="fas fa-envelope"></i> Email</label><input type="email" id="reg-email" placeholder="email@example.com"></div>
+                <div id="code-verification" style="display:none;">
+                    <div class="form-group"><label><i class="fas fa-key"></i> Код подтверждения</label><input type="text" id="reg-code" placeholder="6-значный код" maxlength="6"></div>
+                    <button class="auth-btn secondary-btn" id="verify-code-btn">Подтвердить код</button>
+                </div>
+                <button class="auth-btn" id="send-code-btn"><i class="fas fa-paper-plane"></i> Отправить код</button>
+                <p class="auth-switch">Уже есть аккаунт? <a href="#" id="show-login">Войти</a></p>
+            </div>
+            <div id="setup-profile" style="display:none;">
+                <h2 class="auth-title">Настройте профиль</h2>
+                <p class="auth-sub">Шаг 2 из 2 — Данные профиля</p>
+                <div class="auth-steps"><div class="step done">✓</div><div class="step-line active"></div><div class="step active">2</div></div>
+                <div class="avatar-upload-area" id="avatar-upload-area">
+                    <div class="avatar-preview" id="avatar-preview"><i class="fas fa-camera"></i></div>
+                    <span>Загрузить фото</span>
+                    <input type="file" id="setup-avatar" accept="image/*" style="position:absolute;opacity:0;inset:0;cursor:pointer;">
+                </div>
+                <div class="form-group"><label><i class="fas fa-user"></i> Имя</label><input type="text" id="setup-name" placeholder="Ваше имя"></div>
+                <div class="form-group"><label><i class="fas fa-at"></i> Username</label><div class="username-wrapper"><span class="username-prefix">@</span><input type="text" id="setup-username" placeholder="username"></div></div>
+                <div class="form-group"><label><i class="fas fa-lock"></i> Пароль</label><div class="password-wrapper"><input type="password" id="setup-password" placeholder="Минимум 6 символов"><button type="button" class="toggle-pass" onclick="togglePassword('setup-password',this)"><i class="fas fa-eye"></i></button></div></div>
+                <div class="form-group"><label><i class="fas fa-align-left"></i> О себе</label><textarea id="setup-bio" placeholder="Расскажите о себе..." rows="2"></textarea></div>
+                <div class="form-group"><label><i class="fas fa-image"></i> Баннер</label><input type="file" id="setup-banner" accept="image/*"></div>
+                <button class="auth-btn" id="complete-registration"><i class="fas fa-check"></i> Создать аккаунт</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== POST MODAL ===== -->
+    <div class="modal" id="post-modal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Новый пост</h2><button class="close-modal-btn" onclick="closeModal('post-modal')"><i class="fas fa-times"></i></button></div>
+            <div id="post-author-info"></div>
+            <textarea id="post-text" placeholder="Что у вас нового?" rows="4"></textarea>
+            <div id="post-media-previews"></div>
+            <div class="post-toolbar">
+                <label class="toolbar-btn" title="Фото"><i class="fas fa-image"></i><input type="file" id="post-image" accept="image/*" style="display:none;"></label>
+                <label class="toolbar-btn" title="Видео"><i class="fas fa-video"></i><input type="file" id="post-video" accept="video/*" style="display:none;"></label>
+                <label class="toolbar-btn" title="Аудио"><i class="fas fa-music"></i><input type="file" id="post-audio" accept="audio/*" style="display:none;"></label>
+                <div class="char-counter"><span id="char-count">0</span>/500</div>
+            </div>
+            <button class="auth-btn" id="publish-post"><i class="fas fa-paper-plane"></i> Опубликовать</button>
+        </div>
+    </div>
+
+    <!-- ===== COMMENTS MODAL ===== -->
+    <div class="modal" id="comments-modal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Комментарии</h2><button class="close-modal-btn" onclick="closeModal('comments-modal')"><i class="fas fa-times"></i></button></div>
+            <div id="comments-list" class="comments-list"></div>
+            <div class="comment-input-area"><input type="text" id="new-comment" placeholder="Написать комментарий..."><button id="add-comment" class="send-btn"><i class="fas fa-paper-plane"></i></button></div>
+        </div>
+    </div>
+
+    <!-- ===== VERIFY MODAL ===== -->
+    <div class="modal" id="verify-modal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Верификация</h2><button class="close-modal-btn" onclick="closeModal('verify-modal')"><i class="fas fa-times"></i></button></div>
+            <div class="verify-info"><div class="verify-badge-icon"><i class="fas fa-check-circle"></i></div><p>Верифицированный аккаунт получает синюю галочку. Администратор рассмотрит заявку в ближайшее время.</p></div>
+            <button class="auth-btn" id="send-verify-request"><i class="fas fa-paper-plane"></i> Отправить заявку</button>
+        </div>
+    </div>
+
+    <!-- ===== CREATE COMMUNITY MODAL ===== -->
+    <div class="modal" id="create-community-modal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Создать сообщество</h2><button class="close-modal-btn" onclick="closeModal('create-community-modal')"><i class="fas fa-times"></i></button></div>
+            <div class="form-group"><label>Название</label><input type="text" id="community-name" placeholder="Название сообщества"></div>
+            <div class="form-group"><label>Описание</label><textarea id="community-description" placeholder="О чём ваше сообщество?" rows="3"></textarea></div>
+            <div class="form-group"><label>Категория</label>
+                <select id="community-category">
+                    <option value="general">🌐 Общее</option>
+                    <option value="gaming">🎮 Игры</option>
+                    <option value="news">📰 Новости</option>
+                    <option value="music">🎵 Музыка</option>
+                    <option value="art">🎨 Искусство</option>
+                    <option value="tech">💻 Технологии</option>
+                    <option value="sports">⚽ Спорт</option>
+                    <option value="science">🔬 Наука</option>
+                    <option value="food">🍕 Еда</option>
+                    <option value="travel">✈️ Путешествия</option>
+                    <option value="humor">😂 Юмор</option>
+                    <option value="other">📦 Другое</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Аватар</label><input type="file" id="community-avatar" accept="image/*"></div>
+            <div class="form-group"><label>Баннер</label><input type="file" id="community-banner" accept="image/*"></div>
+            <button class="auth-btn" id="create-community"><i class="fas fa-users"></i> Создать</button>
+        </div>
+    </div>
+
+    <!-- ===== CALL MODAL ===== -->
+    <div class="modal" id="call-modal">
+        <div class="modal-content call-container">
+            <div class="call-header">
+                <div class="call-avatar" id="call-avatar"></div>
+                <h2 id="call-name">Звонок</h2>
+                <p id="call-status">Соединение...</p>
+            </div>
+            <div class="call-controls">
+                <button id="call-mute" class="call-btn"><i class="fas fa-microphone"></i></button>
+                <button id="call-video" class="call-btn"><i class="fas fa-video"></i></button>
+                <button id="call-end" class="call-btn end-call" onclick="endCall()"><i class="fas fa-phone-slash"></i></button>
+            </div>
+            <div class="call-videos">
+                <video id="remote-video" autoplay playsinline></video>
+                <video id="local-video" autoplay muted playsinline class="local-video"></video>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== STORY MODAL ===== -->
+    <div class="modal" id="story-modal">
+        <div class="modal-content story-viewer">
+            <button class="close-story" onclick="closeStoryModal()"><i class="fas fa-times"></i></button>
+            <div class="story-progress" id="story-progress"></div>
+            <div class="story-author-bar" id="story-author-bar"></div>
+            <div class="story-content" id="story-content"></div>
+            <div class="story-nav">
+                <button id="prev-story"><i class="fas fa-chevron-left"></i></button>
+                <button id="next-story"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="story-bottom-bar">
+                <button id="story-views-btn" class="story-action-btn"><i class="fas fa-eye"></i> <span id="story-views-count">0</span></button>
+                <button id="story-delete-btn" class="story-action-btn danger" style="display:none;"><i class="fas fa-trash"></i> Удалить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== STORY VIEWERS MODAL ===== -->
+    <div class="modal" id="story-viewers-modal">
+        <div class="modal-content" style="max-width:380px;">
+            <div class="modal-header"><h2><i class="fas fa-eye"></i> Просмотры</h2><button class="close-modal-btn" onclick="closeModal('story-viewers-modal')"><i class="fas fa-times"></i></button></div>
+            <div id="story-viewers-list"></div>
+        </div>
+    </div>
+
+    <!-- ===== POLL MODAL ===== -->
+    <div class="modal" id="poll-modal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Создать опрос</h2><button class="close-modal-btn" onclick="closeModal('poll-modal')"><i class="fas fa-times"></i></button></div>
+            <div class="form-group"><label>Вопрос</label><input type="text" id="poll-question" placeholder="Задайте вопрос..."></div>
+            <div class="form-group"><label>Варианты (через запятую)</label><input type="text" id="poll-options" placeholder="Вариант 1, Вариант 2, Вариант 3"></div>
+            <button class="auth-btn" id="create-poll"><i class="fas fa-chart-bar"></i> Создать опрос</button>
+        </div>
+    </div>
+
+    <!-- ===== REPORT MODAL ===== -->
+    <div class="modal" id="report-modal">
+        <div class="modal-content" style="max-width:400px;">
+            <div class="modal-header"><h2><i class="fas fa-flag"></i> Пожаловаться</h2><button class="close-modal-btn" onclick="closeModal('report-modal')"><i class="fas fa-times"></i></button></div>
+            <p style="color:var(--text-secondary);margin-bottom:1rem;font-size:13px;">Выберите причину жалобы:</p>
+            <div class="report-reasons" id="report-reasons">
+                <label class="report-reason"><input type="radio" name="report-reason" value="spam"> <span>📨 Спам</span></label>
+                <label class="report-reason"><input type="radio" name="report-reason" value="harassment"> <span>😡 Оскорбления / Травля</span></label>
+                <label class="report-reason"><input type="radio" name="report-reason" value="hate"> <span>🚫 Язык ненависти</span></label>
+                <label class="report-reason"><input type="radio" name="report-reason" value="violence"> <span>⚠️ Насилие / Угрозы</span></label>
+                <label class="report-reason"><input type="radio" name="report-reason" value="misinformation"> <span>❌ Дезинформация</span></label>
+                <label class="report-reason"><input type="radio" name="report-reason" value="nsfw"> <span>🔞 Неприемлемый контент</span></label>
+                <label class="report-reason"><input type="radio" name="report-reason" value="other"> <span>📝 Другое</span></label>
+            </div>
+            <div class="form-group" style="margin-top:1rem;"><label>Дополнительно (необязательно)</label><textarea id="report-comment" placeholder="Опишите подробнее..." rows="3"></textarea></div>
+            <button class="auth-btn" id="submit-report-btn"><i class="fas fa-paper-plane"></i> Отправить жалобу</button>
+            <input type="hidden" id="report-target-id">
+            <input type="hidden" id="report-target-type">
+        </div>
+    </div>
+
+    <!-- ===== SUPPORT MODAL (ticket view) ===== -->
+    <div class="modal" id="support-ticket-modal">
+        <div class="modal-content" style="max-width:500px;">
+            <div class="modal-header"><h2>Тикет поддержки</h2><button class="close-modal-btn" onclick="closeModal('support-ticket-modal')"><i class="fas fa-times"></i></button></div>
+            <div id="ticket-detail"></div>
+            <div class="comment-input-area" id="ticket-reply-area" style="display:none;">
+                <input type="text" id="ticket-reply-input" placeholder="Ответить...">
+                <button class="send-btn" id="ticket-reply-btn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== BAN MODAL ===== -->
+    <div class="modal" id="ban-modal">
+        <div class="modal-content" style="max-width:420px;">
+            <div class="modal-header"><h2><i class="fas fa-ban"></i> Выдать бан</h2><button class="close-modal-btn" onclick="closeModal('ban-modal')"><i class="fas fa-times"></i></button></div>
+            <div id="ban-user-info" style="margin-bottom:1rem;"></div>
+            <div class="form-group"><label>Причина бана</label>
+                <select id="ban-reason">
+                    <option value="spam">Спам</option>
+                    <option value="harassment">Оскорбления / Травля</option>
+                    <option value="hate">Язык ненависти</option>
+                    <option value="violence">Насилие / Угрозы</option>
+                    <option value="misinformation">Дезинформация</option>
+                    <option value="nsfw">Неприемлемый контент</option>
+                    <option value="cheating">Читинг / Мошенничество</option>
+                    <option value="other">Другое</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Комментарий</label><textarea id="ban-comment" placeholder="Подробности бана..." rows="2"></textarea></div>
+            <div class="form-group"><label>Срок бана</label>
+                <select id="ban-duration">
+                    <option value="1">1 день</option>
+                    <option value="3">3 дня</option>
+                    <option value="7">7 дней</option>
+                    <option value="30">30 дней</option>
+                    <option value="0">Навсегда</option>
+                </select>
+            </div>
+            <button class="auth-btn danger-btn" id="confirm-ban-btn"><i class="fas fa-ban"></i> Забанить</button>
+            <input type="hidden" id="ban-target-id">
+        </div>
+    </div>
+
+    <!-- ===== ASSIGN BADGE MODAL ===== -->
+    <div class="modal" id="assign-badge-modal">
+        <div class="modal-content" style="max-width:420px;">
+            <div class="modal-header"><h2><i class="fas fa-medal"></i> Выдать бейдж</h2><button class="close-modal-btn" onclick="closeModal('assign-badge-modal')"><i class="fas fa-times"></i></button></div>
+            <div id="assign-badge-list"></div>
+            <div class="form-group" style="margin-top:1rem;"><label>Выдать пользователю</label>
+                <select id="assign-badge-user"><option value="all">Всем пользователям</option></select>
+            </div>
+            <button class="auth-btn" id="confirm-assign-badge"><i class="fas fa-check"></i> Выдать</button>
+            <input type="hidden" id="assign-badge-id">
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+function togglePassword(inputId, btn) {
+    const el = document.getElementById(inputId);
+    if (!el) return;
+    const isPass = el.type === 'password';
+    el.type = isPass ? 'text' : 'password';
+    btn.innerHTML = isPass ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+}
+function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
+</script>
+</body>
+</html>
